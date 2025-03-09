@@ -1,6 +1,6 @@
 <template>
   <div id="userLoginView">
-    <h2 style="margin-bottom: 16px">用户登录</h2>
+    <h2 style="margin-bottom: 16px; text-align: center">用户登录</h2>
     <a-form
       style="max-width: 480px; margin: 0 auto"
       label-align="left"
@@ -17,10 +17,18 @@
           placeholder="请输入密码"
         />
       </a-form-item>
-      <a-form-item>
-        <a-button type="primary" html-type="submit"> 登录 </a-button>
-        <a-button @click="goToTargetPage" type="outline">注册</a-button>
-      </a-form-item>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <a-form-item style="width: 100%">
+          <a-button type="primary" html-type="submit" style="width: 100%"
+            >登录</a-button
+          >
+        </a-form-item>
+        <a-form-item style="width: 100%">
+          <a-button @click="goToTargetPage" type="outline" style="width: 100%"
+            >注册</a-button
+          >
+        </a-form-item>
+      </div>
     </a-form>
   </div>
 </template>
@@ -56,6 +64,7 @@ const handleSubmit = async () => {
       path: "/",
       replace: true,
     });
+    localStorage.setItem("userId", res.data.id);
   } else {
     message.error("登陆失败，" + res.message);
   }

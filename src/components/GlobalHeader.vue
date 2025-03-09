@@ -23,7 +23,11 @@
     </a-col>
     <a-col flex="100px">
       <div>
-        {{ store.state.user?.loginUser?.userName ?? "未登录" }}
+        {{
+          store.state.user?.loginUser
+            ? store.state.user.loginUser.userName ?? "无昵称"
+            : "未登录"
+        }}
       </div>
     </a-col>
   </a-row>

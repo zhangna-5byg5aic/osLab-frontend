@@ -1,4 +1,5 @@
 <template>
+  <h2 style="margin-bottom: 16px; text-align: center">用户注册</h2>
   <div class="form-container">
     <a-form
       ref="formRef"
@@ -7,7 +8,7 @@
       :style="{ width: '600px' }"
       @submit="handleSubmit"
     >
-      <a-form-item field="userAccount" label="Username" validate-trigger="blur">
+      <a-form-item field="userAccount" label="用户名" validate-trigger="blur">
         <a-input v-model="form.userAccount" placeholder="请输入用户名" />
       </a-form-item>
       <a-form-item field="userPassword" label="密码" validate-trigger="blur">
@@ -26,14 +27,21 @@
           placeholder="请确认密码"
         />
       </a-form-item>
-      <a-form-item>
-        <a-space>
-          <a-button html-type="submit" type="primary">提交</a-button>
-          <a-button @click="$refs.formRef.resetFields()" type="outline"
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <a-form-item>
+          <a-button html-type="submit" type="primary" style="width: 100%"
+            >提交</a-button
+          >
+        </a-form-item>
+        <a-form-item>
+          <a-button
+            @click="$refs.formRef.resetFields()"
+            type="outline"
+            style="width: 100%"
             >重置
           </a-button>
-        </a-space>
-      </a-form-item>
+        </a-form-item>
+      </div>
     </a-form>
   </div>
 </template>
