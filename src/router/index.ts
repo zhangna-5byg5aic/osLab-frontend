@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import { routes } from "@/router/routes";
+import { UserControllerService } from "../../generated";
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -7,9 +8,10 @@ const router = createRouter({
 });
 
 // 添加全局前置守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // 假设有一个方法 `isAuthenticated` 用于检查用户是否登录
-  const isAuthenticated = checkUserLoginStatus();
+  const isAuthenticated = await checkUserLoginStatus();
+  console.log("isAuthenticated:", isAuthenticated);
 
   // 如果用户未登录，且目标路由不是登录页，则跳转到登录页
   if (
@@ -24,9 +26,15 @@ router.beforeEach((to, from, next) => {
 });
 
 // 登录状态检查函数
-function checkUserLoginStatus() {
+async function checkUserLoginStatus() {
   // 替换为你的登录状态检查逻辑，例如检查 localStorage 或 Vuex 中的值
-  return !!localStorage.getItem("userId");
+  try {
+    const response = await UserControllerService.getLoginUserUsingGet();
+    return response.code !== 40100;
+  } catch (error) {
+    console.error("Error checking login status:", error);
+    return false;
+  }
 }
 
 export default router;
