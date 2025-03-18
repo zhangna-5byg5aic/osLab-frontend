@@ -5,25 +5,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineProps } from "vue";
 import * as echarts from "echarts";
+
+// 接收外部传递的数据
+const props = defineProps({
+  nodes: {
+    type: Array,
+    required: true,
+  },
+  links: {
+    type: Array,
+    required: true,
+  },
+  categories: {
+    type: Array,
+    required: true,
+  },
+});
 
 const chart = ref(null);
 let myChart = null;
-
-// 模拟数据
-const mockData = {
-  nodes: [
-    { id: "1", name: "操作系统", category: 0 },
-    { id: "2", name: "进程管理", category: 1 },
-    { id: "3", name: "内存管理", category: 1 },
-  ],
-  links: [
-    { source: "1", target: "2" },
-    { source: "1", target: "3" },
-  ],
-  categories: [{ name: "核心概念" }, { name: "子概念" }],
-};
 
 // 初始化图表
 const initChart = () => {
@@ -31,14 +33,14 @@ const initChart = () => {
 
   const option = {
     tooltip: { trigger: "item" },
-    legend: [{ data: mockData.categories.map((c) => c.name) }],
+    legend: [{ data: props.categories.map((c) => c.name) }],
     series: [
       {
         type: "graph",
         layout: "force",
-        data: mockData.nodes,
-        links: mockData.links,
-        categories: mockData.categories,
+        data: props.nodes,
+        links: props.links,
+        categories: props.categories,
         roam: true,
         label: { show: true },
         force: { repulsion: 200, edgeLength: 100 },
@@ -54,30 +56,9 @@ const initChart = () => {
   myChart.on("click", (params) => {
     if (params.dataType === "node") {
       const nodeId = params.data.id;
-      // TODO: 调用后端接口，根据 nodeId 加载更多数据
       console.log(`点击节点：${nodeId}，应调用接口加载更多相关节点`);
       // 示例：模拟展开新节点
-      expandNode(nodeId);
     }
-  });
-};
-
-// 模拟展开节点
-const expandNode = (nodeId) => {
-  const newNodeId = `${nodeId}-new`;
-  const newNode = { id: newNodeId, name: `新节点 ${newNodeId}`, category: 1 };
-  const newLink = { source: nodeId, target: newNodeId };
-
-  mockData.nodes.push(newNode);
-  mockData.links.push(newLink);
-
-  myChart.setOption({
-    series: [
-      {
-        data: mockData.nodes,
-        links: mockData.links,
-      },
-    ],
   });
 };
 

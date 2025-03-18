@@ -4,6 +4,13 @@
       <a-col :md="12" :xs="24">
         <a-tabs default-active-key="question">
           <a-tab-pane key="question" title="题目">
+            <a-card>
+              <KnowledgeGraph
+                :nodes="nodes"
+                :links="links"
+                :categories="categories"
+              />
+            </a-card>
             <a-card v-if="question" :title="question.title">
               <!--              <a-descriptions
                 title="判题条件"
@@ -64,7 +71,7 @@
           :language="form.language"
           :handle-change="changeCode"
         />
-        <a-divider size="0" />
+        <a-divider />
         <a-button type="primary" style="min-width: 200px" @click="doSubmit">
           评测
         </a-button>
@@ -84,6 +91,7 @@ import {
 import message from "@arco-design/web-vue/es/message";
 import CodeEditor from "@/components/CodeEditor.vue";
 import MdViewer from "@/components/MdViewer.vue";
+import KnowledgeGraph from "@/components/KnowledgeGraph.vue";
 
 interface Props {
   id: string;
@@ -140,6 +148,19 @@ onMounted(() => {
 const changeCode = (value: string) => {
   form.value.code = value;
 };
+// 模拟外部传递的数据
+const nodes = ref([
+  { id: "1", name: "操作系统", category: 0 },
+  { id: "2", name: "进程管理", category: 1 },
+  { id: "3", name: "内存管理", category: 1 },
+]);
+
+const links = ref([
+  { source: "1", target: "2", value: "关系1" },
+  { source: "1", target: "3", value: "关系2" },
+]);
+
+const categories = ref([{ name: "核心概念" }, { name: "子概念" }]);
 </script>
 
 <style>

@@ -108,7 +108,7 @@ const toggleMenu = () => {
 
 // 跳转到用户中心页面
 const navigateToUserCenter = () => {
-  router.push({ path: "/user/center" });
+  router.push({ path: "/center" });
 };
 
 // 调用退出登录接口

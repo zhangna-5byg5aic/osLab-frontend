@@ -29,11 +29,6 @@ export const routes: Array<RouteRecordRaw> = [
         name: "用户注册",
         component: UserRegisterView,
       },
-      {
-        path: "/user/center",
-        name: "用户中心",
-        component: UserCenterView,
-      },
     ],
     meta: {
       hideInMenu: true,
@@ -83,6 +78,11 @@ export const routes: Array<RouteRecordRaw> = [
     meta: {
       access: ACCESS_ENUM.ADMIN,
     },
+  },
+  {
+    path: "/center",
+    name: "用户中心",
+    component: UserCenterView,
   },
   // {
   //   path: "/",
