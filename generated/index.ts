@@ -8,6 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { BaseResponse_boolean_ } from './models/BaseResponse_boolean_';
+export type { BaseResponse_GraphDataDTO_ } from './models/BaseResponse_GraphDataDTO_';
 export type { BaseResponse_int_ } from './models/BaseResponse_int_';
 export type { BaseResponse_LoginUserVO_ } from './models/BaseResponse_LoginUserVO_';
 export type { BaseResponse_long_ } from './models/BaseResponse_long_';
@@ -24,11 +25,15 @@ export type { BaseResponse_QuestionVO_ } from './models/BaseResponse_QuestionVO_
 export type { BaseResponse_string_ } from './models/BaseResponse_string_';
 export type { BaseResponse_User_ } from './models/BaseResponse_User_';
 export type { BaseResponse_UserVO_ } from './models/BaseResponse_UserVO_';
+export type { CategoryDTO } from './models/CategoryDTO';
 export type { DeleteRequest } from './models/DeleteRequest';
+export type { GraphDataDTO } from './models/GraphDataDTO';
 export type { JudgeCase } from './models/JudgeCase';
 export type { JudgeConfig } from './models/JudgeConfig';
 export type { JudgeInfo } from './models/JudgeInfo';
+export type { LinkDTO } from './models/LinkDTO';
 export type { LoginUserVO } from './models/LoginUserVO';
+export type { NodeDTO } from './models/NodeDTO';
 export type { OrderItem } from './models/OrderItem';
 export type { Page_Post_ } from './models/Page_Post_';
 export type { Page_PostVO_ } from './models/Page_PostVO_';
@@ -65,6 +70,7 @@ export type { UserUpdateRequest } from './models/UserUpdateRequest';
 export type { UserVO } from './models/UserVO';
 
 export { FileControllerService } from './services/FileControllerService';
+export { KnowledgeGraphControllerService } from './services/KnowledgeGraphControllerService';
 export { PostControllerService } from './services/PostControllerService';
 export { PostFavourControllerService } from './services/PostFavourControllerService';
 export { PostThumbControllerService } from './services/PostThumbControllerService';

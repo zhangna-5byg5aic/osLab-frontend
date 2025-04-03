@@ -5,23 +5,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted, defineProps, watch } from "vue";
 import * as echarts from "echarts";
 
-// 接收外部传递的数据
 const props = defineProps({
-  nodes: {
-    type: Array,
-    required: true,
-  },
-  links: {
-    type: Array,
-    required: true,
-  },
-  categories: {
-    type: Array,
-    required: true,
-  },
+  nodes: { type: Array, required: true },
+  links: { type: Array, required: true },
+  categories: { type: Array, required: true },
 });
 
 const chart = ref(null);
@@ -30,9 +20,39 @@ let myChart = null;
 // 初始化图表
 const initChart = () => {
   myChart = echarts.init(chart.value);
+  updateChart();
+};
 
+// 更新图表数据
+const updateChart = () => {
   const option = {
-    tooltip: { trigger: "item" },
+    tooltip: {
+      trigger: "item",
+      confine: true, // 强制 tooltip 不超出图表区域
+      extraCssText: `
+      max-width: 300px;
+      white-space: normal !important;
+      word-wrap: break-word !important;
+    `,
+      formatter: (params) => {
+        // 如果鼠标悬停在节点上
+        if (params.dataType === "node") {
+          const node = params.data;
+          return `
+            <div style="font-weight: bold; margin-bottom: 4px;">${
+              node.name
+            }</div>
+            <div>${node.description || "暂无描述"}</div>
+          `;
+        }
+        // 如果鼠标悬停在边上（连接线）
+        else if (params.dataType === "edge") {
+          const link = params.data;
+          return `关系: ${link.label || link.value || "未知"}`;
+        }
+        return params.name;
+      },
+    },
     legend: [{ data: props.categories.map((c) => c.name) }],
     series: [
       {
@@ -49,18 +69,19 @@ const initChart = () => {
       },
     ],
   };
-
   myChart.setOption(option);
-
-  // 监听点击事件，模拟展开和收起
-  myChart.on("click", (params) => {
-    if (params.dataType === "node") {
-      const nodeId = params.data.id;
-      console.log(`点击节点：${nodeId}，应调用接口加载更多相关节点`);
-      // 示例：模拟展开新节点
-    }
-  });
 };
+
+// 监听 props 变化，更新图表
+watch(
+  () => [props.nodes, props.links, props.categories],
+  () => {
+    if (myChart) {
+      updateChart();
+    }
+  },
+  { deep: true } // 深度监听，确保数组内容变化也能触发
+);
 
 onMounted(() => {
   initChart();

@@ -2,31 +2,25 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BaseResponse_string_ } from '../models/BaseResponse_string_';
+import type { BaseResponse_GraphDataDTO_ } from '../models/BaseResponse_GraphDataDTO_';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-export class FileControllerService {
+export class KnowledgeGraphControllerService {
     /**
-     * uploadFile
-     * @param file file
-     * @param biz
-     * @returns BaseResponse_string_ OK
-     * @returns any Created
+     * getKnowledgeGraphData
+     * @param name name
+     * @returns BaseResponse_GraphDataDTO_ OK
      * @throws ApiError
      */
-    public static uploadFileUsingPost(
-        file: Blob,
-        biz?: string,
-    ): CancelablePromise<BaseResponse_string_ | any> {
+    public static getKnowledgeGraphDataUsingGet(
+      name?: string,
+    ): CancelablePromise<BaseResponse_GraphDataDTO_> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/file/upload',
+            method: 'GET',
+            url: '/api/knowledge_graph/get',
             query: {
-                'biz': biz,
-            },
-            formData: {
-                'file': file,
+                'name': name,
             },
             errors: {
                 401: `Unauthorized`,

@@ -83,6 +83,11 @@
 <script setup lang="ts">
 import { onMounted, ref, watchEffect, withDefaults, defineProps } from "vue";
 import {
+  CategoryDTO,
+  type GraphDataDTO,
+  KnowledgeGraphControllerService,
+  LinkDTO,
+  NodeDTO,
   Question,
   QuestionControllerService,
   QuestionSubmitAddRequest,
@@ -112,6 +117,16 @@ const loadData = async () => {
   } else {
     message.error("加载失败，" + res.message);
   }
+  const graph =
+    await KnowledgeGraphControllerService.getKnowledgeGraphDataUsingGet("MMU");
+  if (graph.code == 0) {
+    console.log(graph.data);
+    if (graph.data != undefined) {
+      nodes.value = graph.data.nodes || [];
+      links.value = graph.data.links || [];
+      categories.value = graph.data.categories || [];
+    }
+  }
 };
 
 const form = ref<QuestionSubmitAddRequest>({
@@ -126,7 +141,6 @@ const doSubmit = async () => {
   if (!question.value?.id) {
     return;
   }
-
   const res = await QuestionControllerService.doQuestionSubmitUsingPost({
     ...form.value,
     questionId: question.value.id,
@@ -148,19 +162,21 @@ onMounted(() => {
 const changeCode = (value: string) => {
   form.value.code = value;
 };
-// 模拟外部传递的数据
+const nodes = ref<NodeDTO[]>([]);
+const links = ref<LinkDTO[]>([]);
+const categories = ref<CategoryDTO[]>([]);
+/*// 模拟外部传递的数据
 const nodes = ref([
-  { id: "1", name: "操作系统", category: 0 },
-  { id: "2", name: "进程管理", category: 1 },
-  { id: "3", name: "内存管理", category: 1 },
+  { id: "1", name: "操作系统", category: "子概念" },
+  { id: "2", name: "进程管理", category: "子概念" },
+  { id: "3", name: "内存管理", category: "子概念" },
 ]);
 
 const links = ref([
   { source: "1", target: "2", value: "关系1" },
   { source: "1", target: "3", value: "关系2" },
 ]);
-
-const categories = ref([{ name: "核心概念" }, { name: "子概念" }]);
+const categories = ref([{ name: "核心概念" }, { name: "子概念" }]);*/
 </script>
 
 <style>
