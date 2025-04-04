@@ -5,13 +5,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps, watch } from "vue";
+import { ref, onMounted, defineProps, watch, reactive } from "vue";
 import * as echarts from "echarts";
+import { KnowledgeGraphControllerService } from "../../generated";
 
 const props = defineProps({
   nodes: { type: Array, required: true },
   links: { type: Array, required: true },
   categories: { type: Array, required: true },
+});
+// 创建响应式副本
+const chartData = reactive({
+  nodes: [...props.nodes], // 复制初始的 nodes
+  links: [...props.links], // 复制初始的 links
+  categories: [...props.categories], // 复制初始的 categories
 });
 
 const chart = ref(null);
@@ -21,6 +28,33 @@ let myChart = null;
 const initChart = () => {
   myChart = echarts.init(chart.value);
   updateChart();
+  // 添加点击事件监听
+  myChart.on("click", handleNodeClick);
+};
+// 点击节点事件处理
+const handleNodeClick = async (params) => {
+  // 只处理点击的是节点（避免点击边连接线等）
+  if (params.dataType === "node") {
+    const nodeName = params.data.name;
+
+    // 请求新的数据
+    try {
+      const newData =
+        await KnowledgeGraphControllerService.getKnowledgeGraphDataUsingGet(
+          nodeName
+        );
+
+      // 使用副本来更新数据
+      chartData.nodes = newData.data.nodes;
+      chartData.links = newData.data.links;
+      chartData.categories = newData.data.categories;
+
+      // 重新渲染图表
+      updateChart();
+    } catch (error) {
+      console.error("获取图表数据失败:", error);
+    }
+  }
 };
 
 // 更新图表数据
@@ -58,9 +92,9 @@ const updateChart = () => {
       {
         type: "graph",
         layout: "force",
-        data: props.nodes,
-        links: props.links,
-        categories: props.categories,
+        data: chartData.nodes,
+        links: chartData.links,
+        categories: chartData.categories,
         roam: true,
         label: { show: true },
         force: { repulsion: 200, edgeLength: 100 },
@@ -77,6 +111,9 @@ watch(
   () => [props.nodes, props.links, props.categories],
   () => {
     if (myChart) {
+      chartData.nodes = [...props.nodes];
+      chartData.links = [...props.links];
+      chartData.categories = [...props.categories];
       updateChart();
     }
   },

@@ -147,6 +147,7 @@ const toQuestionPage = (question: Question) => {
   router.push({
     path: `/view/question/${question.id}`,
   });
+  // window.open(`/view/question/${question.id}`, "_blank");
 };
 
 /**
