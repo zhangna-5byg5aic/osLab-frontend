@@ -3,6 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { BaseResponse_boolean_ } from '../models/BaseResponse_boolean_';
+import type { BaseResponse_List_QuestionSets_ } from '../models/BaseResponse_List_QuestionSets_';
+import type { BaseResponse_List_QuestionVO_ } from '../models/BaseResponse_List_QuestionVO_';
 import type { BaseResponse_long_ } from '../models/BaseResponse_long_';
 import type { BaseResponse_Page_Question_ } from '../models/BaseResponse_Page_Question_';
 import type { BaseResponse_Page_QuestionSubmitVO_ } from '../models/BaseResponse_Page_QuestionSubmitVO_';
@@ -106,6 +108,28 @@ export class QuestionControllerService {
         });
     }
     /**
+     * getQuestionBySets
+     * @param setId setId
+     * @returns BaseResponse_List_QuestionVO_ OK
+     * @throws ApiError
+     */
+    public static getQuestionBySetsUsingGet(
+        setId?: number,
+    ): CancelablePromise<BaseResponse_List_QuestionVO_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/question/get/set',
+            query: {
+                'setId': setId,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
      * getQuestionVOById
      * @param id id
      * @returns BaseResponse_QuestionVO_ OK
@@ -183,6 +207,22 @@ export class QuestionControllerService {
             method: 'POST',
             url: '/api/question/my/list/page/vo',
             body: questionQueryRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getQuestionSets
+     * @returns BaseResponse_List_QuestionSets_ OK
+     * @throws ApiError
+     */
+    public static getQuestionSetsUsingGet(): CancelablePromise<BaseResponse_List_QuestionSets_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/question/questionSets',
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
