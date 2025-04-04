@@ -117,15 +117,21 @@ const loadData = async () => {
   } else {
     message.error("加载失败，" + res.message);
   }
-  const graph =
-    await KnowledgeGraphControllerService.getKnowledgeGraphDataUsingGet("MMU");
-  if (graph.code == 0) {
-    console.log(graph.data);
-    if (graph.data != undefined) {
-      nodes.value = graph.data.nodes || [];
-      links.value = graph.data.links || [];
-      categories.value = graph.data.categories || [];
+  if (question.value?.tags) {
+    const graph =
+      await KnowledgeGraphControllerService.getKnowledgeGraphDataByListUsingPost(
+        question.value.tags
+      );
+    if (graph.code == 0) {
+      console.log(graph.data);
+      if (graph.data != undefined) {
+        nodes.value = graph.data.nodes || [];
+        links.value = graph.data.links || [];
+        categories.value = graph.data.categories || [];
+      }
     }
+  } else {
+    console.error("Tags are undefined");
   }
 };
 

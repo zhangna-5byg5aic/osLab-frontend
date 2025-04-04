@@ -14,7 +14,7 @@ export class KnowledgeGraphControllerService {
      * @throws ApiError
      */
     public static getKnowledgeGraphDataUsingGet(
-      name?: string,
+        name?: string,
     ): CancelablePromise<BaseResponse_GraphDataDTO_> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -22,6 +22,27 @@ export class KnowledgeGraphControllerService {
             query: {
                 'name': name,
             },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getKnowledgeGraphDataByList
+     * @param names names
+     * @returns BaseResponse_GraphDataDTO_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static getKnowledgeGraphDataByListUsingPost(
+        names: Array<string>,
+    ): CancelablePromise<BaseResponse_GraphDataDTO_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/knowledge_graph/getMultiple',
+            body: names,
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
