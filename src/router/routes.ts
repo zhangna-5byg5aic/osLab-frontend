@@ -12,6 +12,7 @@ import QuestionsView from "@/views/question/QuestionsView.vue";
 import ViewQuestionView from "@/views/question/ViewQuestionView.vue";
 import QuestionSubmitView from "@/views/question/QuestionSubmitView.vue";
 import UserCenterView from "@/views/user/UserCenterView.vue";
+import ChapterQuestionView from "@/views/question/ChapterQuestionView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -80,10 +81,16 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/chapter",
+    name: "章节题目",
+    component: ChapterQuestionView,
+  },
+  {
     path: "/center",
     name: "用户中心",
     component: UserCenterView,
   },
+
   // {
   //   path: "/",
   //   name: "主页",
