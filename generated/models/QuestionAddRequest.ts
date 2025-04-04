@@ -11,5 +11,6 @@ export type QuestionAddRequest = {
     judgeConfig?: JudgeConfig;
     tags?: Array<string>;
     title?: string;
+    setId?:number;
 };
 

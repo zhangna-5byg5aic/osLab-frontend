@@ -7,6 +7,23 @@
       <a-form-item field="tags" label="标签">
         <a-input-tag v-model="form.tags" placeholder="请选择标签" allow-clear />
       </a-form-item>
+      <a-form-item field="setId" label="题目集">
+        <a-select
+          v-model="form.setId"
+          placeholder="请选择题目集"
+          allow-clear
+          :loading="setsLoading"
+        >
+          <a-option
+            v-for="set in questionSets"
+            :key="set.id"
+            :value="set.id"
+            :label="set.setName"
+          >
+            {{ set.setName }}
+          </a-option>
+        </a-select>
+      </a-form-item>
       <a-form-item field="content" label="题目内容">
         <MdEditor :value="form.content" :handle-change="onContentChange" />
       </a-form-item>
@@ -99,7 +116,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
-import { QuestionControllerService } from "../../../generated";
+import { QuestionControllerService, QuestionSets } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRoute } from "vue-router";
 
@@ -108,6 +125,7 @@ const route = useRoute();
 const updatePage = route.path.includes("update");
 
 let form = ref({
+  setId: undefined,
   title: "",
   tags: [],
   answer: "",
@@ -124,6 +142,29 @@ let form = ref({
     },
   ],
 });
+
+// Add these new refs
+const questionSets = ref<QuestionSets[]>([]);
+const setsLoading = ref(false);
+
+/**
+ * 获取题目集列表
+ */
+const loadQuestionSets = async () => {
+  setsLoading.value = true;
+  try {
+    const res = await QuestionControllerService.getQuestionSetsUsingGet();
+    if (res.code === 0) {
+      questionSets.value = res.data || [];
+    } else {
+      message.error("获取题目集失败: " + res.message);
+    }
+  } catch (e) {
+    message.error("获取题目集失败");
+  } finally {
+    setsLoading.value = false;
+  }
+};
 
 /**
  * 根据题目 id 获取老的数据
@@ -170,6 +211,7 @@ const loadData = async () => {
 
 onMounted(() => {
   loadData();
+  loadQuestionSets();
 });
 
 const doSubmit = async () => {
