@@ -53,7 +53,32 @@ watch(
     }
   }
 );
+// 新增：监听语言变化
+watch(
+  () => props.language,
+  () => {
+    if (codeEditor.value) {
+      monaco.editor.setModelLanguage(
+        toRaw(codeEditor.value).getModel(),
+        props.language
+      );
+    }
+  }
+);
 
+// 新增：监听 value 变化
+watch(
+  () => props.value,
+  (newValue) => {
+    if (codeEditor.value) {
+      const editor = toRaw(codeEditor.value);
+      if (newValue !== editor.getValue()) {
+        editor.setValue(newValue);
+      }
+    }
+  },
+  { immediate: true } // 关键：确保初始值生效
+);
 onMounted(() => {
   if (!codeEditorRef.value) {
     return;

@@ -3,7 +3,6 @@
     :columns="columns"
     :data-source="mainTableData"
     :row-key="(record) => record.id"
-    :expandIconColumnIndex="columns.length"
     :expandedRowKeys="expandedRowKeys"
     @expand="handleExpand"
   >
@@ -56,11 +55,11 @@ export default {
         dataIndex: "description",
         key: "description",
       },
-      {
+      /*{
         title: "id",
         dataIndex: "id",
         key: "id",
-      },
+      },*/
     ];
 
     // 子表列定义

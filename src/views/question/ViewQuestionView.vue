@@ -3,7 +3,7 @@
     <a-row :gutter="[24, 24]">
       <a-col :md="12" :xs="24">
         <a-tabs default-active-key="question">
-          <a-tab-pane key="question" title="题目">
+          <a-tab-pane key="knowledgeGraph" title="知识图谱">
             <a-card>
               <KnowledgeGraph
                 :nodes="nodes"
@@ -11,6 +11,8 @@
                 :categories="categories"
               />
             </a-card>
+          </a-tab-pane>
+          <a-tab-pane key="question" title="题目">
             <a-card v-if="question" :title="question.title">
               <!--              <a-descriptions
                 title="判题条件"
@@ -40,8 +42,8 @@
               </template>
             </a-card>
           </a-tab-pane>
-          <a-tab-pane key="comment" title="评论" disabled> 评论区</a-tab-pane>
-          <a-tab-pane key="answer" title="答案"> 暂时无法查看答案</a-tab-pane>
+          <!--          <a-tab-pane key="comment" title="评论" disabled> 评论区</a-tab-pane>
+          <a-tab-pane key="answer" title="答案"> 暂时无法查看答案</a-tab-pane>-->
         </a-tabs>
       </a-col>
       <a-col :md="12" :xs="24">
@@ -114,6 +116,10 @@ const loadData = async () => {
   );
   if (res.code === 0) {
     question.value = res.data;
+    // 将标题设置到代码编辑器的内容中
+    if (res.data?.title) {
+      form.value.code = res.data.originalCode; // 关键修改点
+    }
   } else {
     message.error("加载失败，" + res.message);
   }
@@ -136,7 +142,7 @@ const loadData = async () => {
 };
 
 const form = ref<QuestionSubmitAddRequest>({
-  language: "java",
+  language: "c",
   code: "",
 });
 

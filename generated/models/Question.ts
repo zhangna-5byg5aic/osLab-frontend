@@ -18,5 +18,6 @@ export type Question = {
     title?: string;
     updateTime?: string;
     userId?: number;
+    original?:string;
 };
 
