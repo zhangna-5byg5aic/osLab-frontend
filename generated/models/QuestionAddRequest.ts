@@ -12,5 +12,6 @@ export type QuestionAddRequest = {
     tags?: Array<string>;
     title?: string;
     setId?:number;
+    originalCode?:string;
 };
 

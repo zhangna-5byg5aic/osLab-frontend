@@ -103,6 +103,15 @@
           </a-button>
         </div>
       </a-form-item>
+      <a-form-item field="originalCode" label="初始代码">
+        <div class="code-editor-wrapper">
+          <CodeEditor
+            :value="form.originalCode"
+            :language="form.language"
+            :handle-change="onOriginalCodeChange"
+          />
+        </div>
+      </a-form-item>
       <div style="margin-top: 16px" />
       <a-form-item>
         <a-button type="primary" style="min-width: 200px" @click="doSubmit"
@@ -119,6 +128,7 @@ import MdEditor from "@/components/MdEditor.vue";
 import { QuestionControllerService, QuestionSets } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRoute } from "vue-router";
+import CodeEditor from "@/components/CodeEditor.vue";
 
 const route = useRoute();
 // 如果页面地址包含 update，视为更新页面
@@ -141,11 +151,18 @@ let form = ref({
       output: "",
     },
   ],
+  originalCode: "",
+  language: "c",
 });
 
 // Add these new refs
 const questionSets = ref<QuestionSets[]>([]);
 const setsLoading = ref(false);
+
+// 新增事件处理函数
+const onOriginalCodeChange = (value: string) => {
+  form.value.originalCode = value;
+};
 
 /**
  * 获取题目集列表
@@ -266,5 +283,10 @@ const onAnswerChange = (value: string) => {
 
 <style scoped>
 #addQuestionView {
+}
+/* 父组件中定义高度 */
+.code-editor-wrapper {
+  height: 500px; /* 或使用 calc(100vh - 200px) 动态高度 */
+  width: 60%;
 }
 </style>

@@ -1,9 +1,12 @@
 <template>
-  <div
+  <!--  <div
     id="code-editor"
     ref="codeEditorRef"
     style="min-height: 400px; height: 60vh"
-  />
+  />-->
+  <div class="code-editor-container">
+    <div id="code-editor" ref="codeEditorRef" class="code-editor" />
+  </div>
   <!--  <a-button @click="fillValue">填充值</a-button>-->
 </template>
 
@@ -90,7 +93,7 @@ onMounted(() => {
     automaticLayout: true,
     colorDecorators: true,
     minimap: {
-      enabled: true,
+      enabled: false,
     },
     readOnly: false,
     theme: "vs-dark",
@@ -106,4 +109,17 @@ onMounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 新增样式 */
+.code-editor-container {
+  height: 500px; /* 固定高度 */
+  border: 1px solid #434343; /* 可选边框 */
+  border-radius: 4px;
+}
+
+.code-editor {
+  height: 100%; /* 关键：让编辑器撑满容器 */
+  width: 100%;
+  overflow: hidden; /* 防止滚动条溢出 */
+}
+</style>
