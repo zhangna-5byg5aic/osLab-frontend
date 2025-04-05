@@ -127,12 +127,13 @@ import { onMounted, ref } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
 import { QuestionControllerService, QuestionSets } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import CodeEditor from "@/components/CodeEditor.vue";
 
 const route = useRoute();
 // 如果页面地址包含 update，视为更新页面
 const updatePage = route.path.includes("update");
+const router = useRouter();
 
 let form = ref({
   setId: undefined,
@@ -230,7 +231,6 @@ onMounted(() => {
   loadData();
   loadQuestionSets();
 });
-
 const doSubmit = async () => {
   console.log(form.value);
   // 区分更新还是创建
@@ -240,6 +240,9 @@ const doSubmit = async () => {
     );
     if (res.code === 0) {
       message.success("更新成功");
+      await router.push({
+        path: `/`,
+      });
     } else {
       message.error("更新失败，" + res.message);
     }
@@ -249,6 +252,9 @@ const doSubmit = async () => {
     );
     if (res.code === 0) {
       message.success("创建成功");
+      await router.push({
+        path: `/`,
+      });
     } else {
       message.error("创建失败，" + res.message);
     }

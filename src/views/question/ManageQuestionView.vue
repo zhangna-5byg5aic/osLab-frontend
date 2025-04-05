@@ -118,6 +118,8 @@ const columns = [
   {
     title: "内容",
     dataIndex: "content",
+    ellipsis: true,
+    tooltip: true,
   },
   {
     title: "标签",
@@ -135,14 +137,14 @@ const columns = [
   //   title: "通过数",
   //   dataIndex: "acceptedNum",
   // },
-  {
+  /*{
     title: "判题配置",
     slotName: "judgeConfig",
   },
   {
     title: "判题用例",
     slotName: "judgeCase",
-  },
+  },*/
   {
     title: "创建用户id",
     dataIndex: "userId",

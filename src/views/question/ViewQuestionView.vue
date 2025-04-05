@@ -99,6 +99,7 @@ import message from "@arco-design/web-vue/es/message";
 import CodeEditor from "@/components/CodeEditor.vue";
 import MdViewer from "@/components/MdViewer.vue";
 import KnowledgeGraph from "@/components/KnowledgeGraph.vue";
+import { useRouter } from "vue-router";
 
 interface Props {
   id: string;
@@ -109,6 +110,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const question = ref<QuestionVO>();
+const router = useRouter();
 
 const loadData = async () => {
   const res = await QuestionControllerService.getQuestionVoByIdUsingGet(
@@ -159,6 +161,9 @@ const doSubmit = async () => {
   });
   if (res.code === 0) {
     message.success("提交成功");
+    await router.push({
+      path: `/question_submit`,
+    });
   } else {
     message.error("提交失败," + res.message);
   }
