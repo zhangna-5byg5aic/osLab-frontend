@@ -128,6 +128,8 @@ const columns = [
   {
     title: "参考答案",
     dataIndex: "answer",
+    ellipsis: true,
+    tooltip: true,
   },
   // {
   //   title: "提交数",

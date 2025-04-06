@@ -13,7 +13,7 @@
         >
           <div class="title-bar">
             <img class="logo" src="../assets/oj-logo.svg" />
-            <div class="title">OSLab 操作系统实验平台</div>
+            <div class="title">OSLab 操作系统课程设计实验平台</div>
           </div>
         </a-menu-item>
         <a-menu-item v-for="item in visibleRoutes" :key="item.path">

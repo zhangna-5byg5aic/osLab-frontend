@@ -27,6 +27,15 @@
       <a-form-item field="content" label="题目内容">
         <MdEditor :value="form.content" :handle-change="onContentChange" />
       </a-form-item>
+      <a-form-item field="originalCode" label="初始框架代码">
+        <div class="code-editor-wrapper">
+          <CodeEditor
+            :value="form.originalCode"
+            :language="form.language"
+            :handle-change="onOriginalCodeChange"
+          />
+        </div>
+      </a-form-item>
       <a-form-item field="answer" label="答案">
         <MdEditor :value="form.answer" :handle-change="onAnswerChange" />
       </a-form-item>
@@ -61,7 +70,7 @@
           </a-form-item>
         </a-space>
       </a-form-item>
-      <a-form-item
+      <!--      <a-form-item
         label="测试用例配置"
         :content-flex="false"
         :merge-props="false"
@@ -102,16 +111,7 @@
             >新增测试用例
           </a-button>
         </div>
-      </a-form-item>
-      <a-form-item field="originalCode" label="初始代码">
-        <div class="code-editor-wrapper">
-          <CodeEditor
-            :value="form.originalCode"
-            :language="form.language"
-            :handle-change="onOriginalCodeChange"
-          />
-        </div>
-      </a-form-item>
+      </a-form-item>-->
       <div style="margin-top: 16px" />
       <a-form-item>
         <a-button type="primary" style="min-width: 200px" @click="doSubmit"
