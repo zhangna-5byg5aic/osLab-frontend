@@ -30,6 +30,22 @@ export class KnowledgeGraphControllerService {
         });
     }
     /**
+     * getAllKnowledgeGraphData
+     * @returns BaseResponse_GraphDataDTO_ OK
+     * @throws ApiError
+     */
+    public static getAllKnowledgeGraphDataUsingGet(): CancelablePromise<BaseResponse_GraphDataDTO_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/knowledge_graph/getAll',
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
      * getKnowledgeGraphDataByList
      * @param names names
      * @returns BaseResponse_GraphDataDTO_ OK

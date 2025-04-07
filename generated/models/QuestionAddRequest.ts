@@ -9,9 +9,9 @@ export type QuestionAddRequest = {
     content?: string;
     judgeCase?: Array<JudgeCase>;
     judgeConfig?: JudgeConfig;
+    originalCode?: string;
+    setId?: number;
     tags?: Array<string>;
     title?: string;
-    setId?:number;
-    originalCode?:string;
 };
 

@@ -12,12 +12,12 @@ export type Question = {
     isDelete?: number;
     judgeCase?: string;
     judgeConfig?: string;
+    originalCode?: string;
     submitNum?: number;
     tags?: string;
     thumbNum?: number;
     title?: string;
     updateTime?: string;
     userId?: number;
-    original?:string;
 };
 

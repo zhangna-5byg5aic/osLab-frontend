@@ -21,6 +21,9 @@ const chartData = reactive({
   categories: [...props.categories], // 复制初始的 categories
 });
 
+// eslint-disable-next-line no-undef
+const emit = defineEmits(["node-click"]);
+
 const chart = ref(null);
 let myChart = null;
 
@@ -55,6 +58,7 @@ const handleNodeClick = async (params) => {
       console.error("获取图表数据失败:", error);
     }
   }
+  emit("node-click", params.data);
 };
 
 // 更新图表数据

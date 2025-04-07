@@ -52,7 +52,36 @@
           <span v-else-if="record.status === 3">判题失败</span>
         </div>
       </template>
+      <template #question="{ record }">
+        {{ record.questionVO?.title }}
+      </template>
+      <!-- 新增操作列 -->
+      <template #action="{ record }">
+        <a-button @click="handleViewDetail(record.id)">查看详情</a-button>
+      </template>
     </a-table>
+    <!-- 详情模态框 -->
+    <a-modal
+      v-model:visible="visible"
+      title="提交详情"
+      width="700px"
+      :footer="false"
+    >
+      <a-descriptions :column="1" bordered v-if="detail">
+        <a-descriptions-item label="题目名称">{{
+          detail.questionVO?.title
+        }}</a-descriptions-item>
+        <a-descriptions-item label="编程语言">{{
+          detail.language
+        }}</a-descriptions-item>
+        <a-descriptions-item label="提交代码">
+          <pre class="code-block">{{ detail.code }}</pre>
+        </a-descriptions-item>
+        <a-descriptions-item label="判题信息">
+          {{ detail.judgeInfo?.message }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-modal>
   </div>
 </template>
 
@@ -62,12 +91,17 @@ import {
   Question,
   QuestionControllerService,
   QuestionSubmitQueryRequest,
+  QuestionSubmitVO,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 import moment from "moment";
 
 const tableRef = ref();
+
+// 新增响应式变量
+const visible = ref(false);
+const detail = ref<QuestionSubmitVO>();
 
 const dataList = ref([]);
 const total = ref(0);
@@ -127,8 +161,8 @@ const columns = [
     slotName: "JudgeStatus",
   },
   {
-    title: "题目 id",
-    dataIndex: "questionId",
+    title: "题目",
+    slotName: "question",
   },
   {
     title: "提交者 id",
@@ -137,6 +171,10 @@ const columns = [
   {
     title: "创建时间",
     slotName: "createTime",
+  },
+  {
+    title: "操作",
+    slotName: "action",
   },
 ];
 
@@ -169,11 +207,36 @@ const doSubmit = () => {
     current: 1,
   };
 };
+// 新增查看详情处理函数
+const handleViewDetail = async (id: number) => {
+  try {
+    const res = await QuestionControllerService.getQuestionSubmitByIdUsingGet(
+      id
+    );
+    if (res.code === 0) {
+      detail.value = res.data;
+      visible.value = true;
+    } else {
+      message.error("获取详情失败: " + res.message);
+    }
+  } catch (error) {
+    message.error("请求失败，请重试");
+  }
+};
 </script>
 
 <style scoped>
 #questionSubmitView {
   max-width: 1280px;
   margin: 0 auto;
+}
+/* 新增代码块样式 */
+.code-block {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  max-height: 400px;
+  white-space: pre-wrap;
 }
 </style>

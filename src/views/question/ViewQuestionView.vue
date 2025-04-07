@@ -4,12 +4,17 @@
       <a-col :md="12" :xs="24">
         <a-tabs default-active-key="question">
           <a-tab-pane key="knowledgeGraph" title="知识图谱">
-            <a-card>
+            <a-card v-if="question" :title="question.title">
               <KnowledgeGraph
                 :nodes="nodes"
                 :links="links"
                 :categories="categories"
               />
+              <template #extra>
+                <a-button type="primary" @click="goToKnowledgeGraphPage">
+                  查看完整知识图谱
+                </a-button>
+              </template>
             </a-card>
           </a-tab-pane>
           <a-tab-pane key="question" title="题目">
@@ -167,6 +172,15 @@ const doSubmit = async () => {
   } else {
     message.error("提交失败," + res.message);
   }
+};
+const goToKnowledgeGraphPage = () => {
+  router.push({
+    path: "/knowledgeGraph",
+    query: {
+      // 可以传递当前题目的标签作为参数
+      tags: question.value?.tags?.join(","),
+    },
+  });
 };
 
 /**

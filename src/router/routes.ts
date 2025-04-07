@@ -13,6 +13,7 @@ import ViewQuestionView from "@/views/question/ViewQuestionView.vue";
 import QuestionSubmitView from "@/views/question/QuestionSubmitView.vue";
 import UserCenterView from "@/views/user/UserCenterView.vue";
 import ChapterQuestionView from "@/views/question/ChapterQuestionView.vue";
+import KnowledgeGraphView from "@/views/knowledgeGraph/KnowledgeGraphView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -98,6 +99,14 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/center",
     name: "用户中心",
     component: UserCenterView,
+  },
+  {
+    path: "/knowledgeGraph",
+    name: "知识图谱",
+    component: KnowledgeGraphView,
+    meta: {
+      hideInMenu: true,
+    },
   },
 
   // {

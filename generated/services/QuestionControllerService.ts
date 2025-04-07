@@ -10,6 +10,7 @@ import type { BaseResponse_Page_Question_ } from '../models/BaseResponse_Page_Qu
 import type { BaseResponse_Page_QuestionSubmitVO_ } from '../models/BaseResponse_Page_QuestionSubmitVO_';
 import type { BaseResponse_Page_QuestionVO_ } from '../models/BaseResponse_Page_QuestionVO_';
 import type { BaseResponse_Question_ } from '../models/BaseResponse_Question_';
+import type { BaseResponse_QuestionSubmitVO_ } from '../models/BaseResponse_QuestionSubmitVO_';
 import type { BaseResponse_QuestionVO_ } from '../models/BaseResponse_QuestionVO_';
 import type { DeleteRequest } from '../models/DeleteRequest';
 import type { QuestionAddRequest } from '../models/QuestionAddRequest';
@@ -244,6 +245,28 @@ export class QuestionControllerService {
             method: 'POST',
             url: '/api/question/question_submit/do',
             body: questionSubmitAddRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getQuestionSubmitById
+     * @param id id
+     * @returns BaseResponse_QuestionSubmitVO_ OK
+     * @throws ApiError
+     */
+    public static getQuestionSubmitByIdUsingGet(
+        id?: number,
+    ): CancelablePromise<BaseResponse_QuestionSubmitVO_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/question/question_submit/get',
+            query: {
+                'id': id,
+            },
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,

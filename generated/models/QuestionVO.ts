@@ -11,6 +11,7 @@ export type QuestionVO = {
     favourNum?: number;
     id?: number;
     judgeConfig?: JudgeConfig;
+    originalCode?: string;
     submitNum?: number;
     tags?: Array<string>;
     thumbNum?: number;
@@ -18,6 +19,5 @@ export type QuestionVO = {
     updateTime?: string;
     userId?: number;
     userVO?: UserVO;
-    originalCode?:string;
 };
 
