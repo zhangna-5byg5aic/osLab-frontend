@@ -37,7 +37,14 @@
         </div>
       </a-form-item>
       <a-form-item field="answer" label="答案">
-        <MdEditor :value="form.answer" :handle-change="onAnswerChange" />
+        <div class="answer-editor">
+          <CodeEditor
+            :value="form.answer"
+            :language="form.language"
+            :handle-change="onAnswerChange"
+          />
+        </div>
+        <!--        <MdEditor :value="form.answer" :handle-change="onAnswerChange" />-->
       </a-form-item>
       <a-form-item label="判题配置" :content-flex="false" :merge-props="false">
         <a-space direction="vertical" style="min-width: 480px">
@@ -292,7 +299,11 @@ const onAnswerChange = (value: string) => {
 }
 /* 父组件中定义高度 */
 .code-editor-wrapper {
-  height: 500px; /* 或使用 calc(100vh - 200px) 动态高度 */
+  height: 500px;
+  width: 60%;
+}
+.answer-editor {
+  height: 500px;
   width: 60%;
 }
 </style>

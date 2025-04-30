@@ -49,6 +49,9 @@
           </a-tab-pane>
           <!--          <a-tab-pane key="comment" title="评论" disabled> 评论区</a-tab-pane>
           <a-tab-pane key="answer" title="答案"> 暂时无法查看答案</a-tab-pane>-->
+          <a-tab-pane key="chat" title="问答" class="chat-tab">
+            <ChatWindow />
+          </a-tab-pane>
         </a-tabs>
       </a-col>
       <a-col :md="12" :xs="24">
@@ -104,6 +107,7 @@ import message from "@arco-design/web-vue/es/message";
 import CodeEditor from "@/components/CodeEditor.vue";
 import MdViewer from "@/components/MdViewer.vue";
 import KnowledgeGraph from "@/components/KnowledgeGraph.vue";
+import ChatWindow from "@/components/ChatWindow.vue";
 import { useRouter } from "vue-router";
 
 interface Props {
@@ -218,5 +222,11 @@ const categories = ref([{ name: "核心概念" }, { name: "子概念" }]);*/
 
 #viewQuestionView .arco-space-horizontal .arco-space-item {
   margin-bottom: 0 !important;
+}
+.chat-tab {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  height: 100vh; /* 设置高度为视口高度 */
 }
 </style>

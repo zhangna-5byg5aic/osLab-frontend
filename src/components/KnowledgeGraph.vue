@@ -96,7 +96,10 @@ const updateChart = () => {
       {
         type: "graph",
         layout: "force",
-        data: chartData.nodes,
+        data: chartData.nodes.map((node) => ({
+          ...node,
+          symbolSize: 20, // 设置所有节点的圆形大小为 20
+        })),
         links: chartData.links,
         categories: chartData.categories,
         roam: true,
@@ -104,6 +107,17 @@ const updateChart = () => {
         force: { repulsion: 200, edgeLength: 100 },
         edgeLabel: { show: true, formatter: "{c}" },
         emphasis: { focus: "adjacency" },
+        lineStyle: {
+          normal: {
+            width: 2,
+            color: "", // 设置关系连线颜色为红色
+            curvenes: 0.2,
+            type: "solid",
+          },
+        },
+        // 设置箭头指向
+        edgeSymbol: ["none", "arrow"], // 第二个 "arrow" 表示目标节点显示箭头
+        edgeSymbolSize: [0, 8], // 设置箭头大小，第二个值控制箭头的大小
       },
     ],
   };

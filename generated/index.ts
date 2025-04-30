@@ -73,6 +73,7 @@ export type { UserUpdateMyRequest } from './models/UserUpdateMyRequest';
 export type { UserUpdateRequest } from './models/UserUpdateRequest';
 export type { UserVO } from './models/UserVO';
 
+export { ChatControllerService } from './services/ChatControllerService';
 export { FileControllerService } from './services/FileControllerService';
 export { KnowledgeGraphControllerService } from './services/KnowledgeGraphControllerService';
 export { PostControllerService } from './services/PostControllerService';
