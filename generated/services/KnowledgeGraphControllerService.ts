@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { BaseResponse_GraphDataDTO_ } from '../models/BaseResponse_GraphDataDTO_';
+import type { BaseResponse_List_string_ } from '../models/BaseResponse_List_string_';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -59,6 +60,22 @@ export class KnowledgeGraphControllerService {
             method: 'POST',
             url: '/api/knowledge_graph/getMultiple',
             body: names,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getAllKnowledgeGraphName
+     * @returns BaseResponse_List_string_ OK
+     * @throws ApiError
+     */
+    public static getAllKnowledgeGraphNameUsingGet(): CancelablePromise<BaseResponse_List_string_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/knowledge_graph/getNames',
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,

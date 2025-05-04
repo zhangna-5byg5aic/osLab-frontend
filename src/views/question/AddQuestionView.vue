@@ -4,8 +4,26 @@
       <a-form-item field="title" label="标题">
         <a-input v-model="form.title" placeholder="请输入标题" />
       </a-form-item>
-      <a-form-item field="tags" label="标签">
-        <a-input-tag v-model="form.tags" placeholder="请选择标签" allow-clear />
+      <a-form-item field="tags" label="关联知识点">
+        <a-input-tag
+          v-model="form.tags"
+          placeholder="请选择关联知识点"
+          allow-clear
+        />
+      </a-form-item>
+      <a-form-item>
+        <div class="collapsible-panel">
+          <div class="panel-header" @click="toggle">
+            <h3>{{ isOpen ? "收起全部知识点" : "展开全部知识点" }}</h3>
+          </div>
+          <div v-if="isOpen" class="panel-body">
+            <a-checkbox-group v-model="form.tags">
+              <a-checkbox v-for="tag in tags" :key="tag" :value="tag">
+                {{ tag }}</a-checkbox
+              >
+            </a-checkbox-group>
+          </div>
+        </div>
       </a-form-item>
       <a-form-item field="setId" label="题目集">
         <a-select
@@ -46,7 +64,7 @@
         </div>
         <!--        <MdEditor :value="form.answer" :handle-change="onAnswerChange" />-->
       </a-form-item>
-      <a-form-item label="判题配置" :content-flex="false" :merge-props="false">
+      <!--      <a-form-item label="判题配置" :content-flex="false" :merge-props="false">
         <a-space direction="vertical" style="min-width: 480px">
           <a-form-item field="judgeConfig.timeLimit" label="时间限制">
             <a-input-number
@@ -76,7 +94,7 @@
             />
           </a-form-item>
         </a-space>
-      </a-form-item>
+      </a-form-item>-->
       <!--      <a-form-item
         label="测试用例配置"
         :content-flex="false"
@@ -130,12 +148,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
-import { QuestionControllerService, QuestionSets } from "../../../generated";
+import {
+  KnowledgeGraphControllerService,
+  QuestionControllerService,
+  QuestionSets,
+} from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRoute, useRouter } from "vue-router";
 import CodeEditor from "@/components/CodeEditor.vue";
+import AccordionCollapse from "@/views/question/CollapseView.vue";
 
 const route = useRoute();
 // 如果页面地址包含 update，视为更新页面
@@ -166,6 +189,19 @@ let form = ref({
 // Add these new refs
 const questionSets = ref<QuestionSets[]>([]);
 const setsLoading = ref(false);
+
+const isOpen = ref<boolean>(false); // 控制面板是否展开
+
+const toggle = () => {
+  isOpen.value = !isOpen.value; // 切换面板状态
+};
+
+const tags = ref<string[]>([]);
+const fetchTags = async () => {
+  const res =
+    await KnowledgeGraphControllerService.getAllKnowledgeGraphNameUsingGet();
+  tags.value = res.data || [];
+};
 
 // 新增事件处理函数
 const onOriginalCodeChange = (value: string) => {
@@ -237,6 +273,7 @@ const loadData = async () => {
 onMounted(() => {
   loadData();
   loadQuestionSets();
+  fetchTags();
 });
 const doSubmit = async () => {
   console.log(form.value);
@@ -305,5 +342,23 @@ const onAnswerChange = (value: string) => {
 .answer-editor {
   height: 500px;
   width: 60%;
+}
+.collapsible-panel {
+  border: 1px solid #ddd;
+  margin: 10px;
+  border-radius: 5px;
+}
+
+.panel-header {
+  background-color: #f5f5f5;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.panel-body {
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
 }
 </style>

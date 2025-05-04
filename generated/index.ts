@@ -12,6 +12,7 @@ export type { BaseResponse_GraphDataDTO_ } from './models/BaseResponse_GraphData
 export type { BaseResponse_int_ } from './models/BaseResponse_int_';
 export type { BaseResponse_List_QuestionSets_ } from './models/BaseResponse_List_QuestionSets_';
 export type { BaseResponse_List_QuestionVO_ } from './models/BaseResponse_List_QuestionVO_';
+export type { BaseResponse_List_string_ } from './models/BaseResponse_List_string_';
 export type { BaseResponse_LoginUserVO_ } from './models/BaseResponse_LoginUserVO_';
 export type { BaseResponse_long_ } from './models/BaseResponse_long_';
 export type { BaseResponse_Page_Post_ } from './models/BaseResponse_Page_Post_';
