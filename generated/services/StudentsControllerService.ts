@@ -2,9 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { BaseResponse_boolean_ } from '../models/BaseResponse_boolean_';
+import type { BaseResponse_Page_Students_ } from '../models/BaseResponse_Page_Students_';
 import type { BaseResponse_StudentVO_ } from '../models/BaseResponse_StudentVO_';
 import type { Resource } from '../models/Resource';
 import type { StudentAddRequest } from '../models/StudentAddRequest';
+import type { StudentQueryRequest } from '../models/StudentQueryRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -67,6 +70,50 @@ export class StudentsControllerService {
                   resolve();
               })
               .catch(reject);
+        });
+    }
+    /**
+     * deleteStudent
+     * @param id id
+     * @returns BaseResponse_boolean_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static deleteStudentUsingPost(
+      id?: number,
+    ): CancelablePromise<BaseResponse_boolean_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/student/delete',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * listStudentByPage
+     * @param studentQueryRequest studentQueryRequest
+     * @returns BaseResponse_Page_Students_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static listStudentByPageUsingPost(
+      studentQueryRequest: StudentQueryRequest,
+    ): CancelablePromise<BaseResponse_Page_Students_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/student/list/page',
+            body: studentQueryRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
         });
     }
 }

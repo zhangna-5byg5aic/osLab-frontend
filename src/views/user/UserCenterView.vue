@@ -34,13 +34,55 @@
         </div>
       </div>
     </a-card>
-    <div>
-      <input type="file" @change="handleFileChange" accept=".xlsx,.csv" />
-      <button @click="uploadAndDownload" :disabled="!file">上传文件</button>
-      <p v-if="uploading">上传中...</p>
-      <p v-if="error" style="color: red">{{ error }}</p>
-      <p v-if="success" style="color: green">上传成功！</p>
-    </div>
+    <a-card title="批量添加学生">
+      <div>
+        <input type="file" @change="handleFileChange" accept=".xlsx,.csv" />
+        <a-button @click="uploadAndDownload" :disabled="!file" type="primary">
+          上传文件
+        </a-button>
+        <p v-if="uploading">上传中...</p>
+        <p v-if="error" style="color: red">{{ error }}</p>
+        <p v-if="success" style="color: green">上传成功！</p>
+      </div>
+    </a-card>
+    <a-card>
+      <a-form :model="searchParams" layout="inline">
+        <a-form-item label="姓名" field="name">
+          <a-input v-model="searchParams.name" placeholder="请输入姓名" />
+        </a-form-item>
+        <a-form-item label="班级" field="className">
+          <a-input v-model="searchParams.className" placeholder="请输入班级" />
+        </a-form-item>
+        <a-form-item label="学号" field="studentNumber">
+          <a-input
+            v-model="searchParams.studentNumber"
+            placeholder="请输入学号"
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="doSubmit">搜索</a-button>
+        </a-form-item>
+      </a-form>
+
+      <a-table
+        :columns="columns"
+        :data="students"
+        :pagination="{
+          showTotal: true,
+          pageSize: searchParams.pageSize,
+          current: searchParams.current,
+          total,
+        }"
+        :loading="loading"
+        @page-change="onPageChange"
+      >
+        <template #action="{ record }">
+          <a-button @click="deleteStudent(record.id)" status="danger"
+            >删除</a-button
+          >
+        </template>
+      </a-table>
+    </a-card>
     <!-- 错误提示 -->
     <a-result
       v-if="error"
@@ -56,10 +98,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, handleError } from "vue";
+import { ref, onMounted } from "vue";
 import dayjs from "dayjs";
 import {
   LoginUserVO,
+  StudentQueryRequest,
   StudentsControllerService,
   UserControllerService,
 } from "../../../generated";
@@ -142,7 +185,88 @@ const handleUploadError = (err: any) => {
 // 生命周期钩子
 onMounted(() => {
   loadUserData();
+  fetchStudents();
 });
+// 学生列表相关
+const students = ref<any[]>([]);
+const total = ref(0);
+const searchParams = ref<StudentQueryRequest>({
+  current: 1,
+  pageSize: 10,
+  name: undefined,
+  className: undefined,
+  studentNumber: undefined,
+});
+
+const columns = [
+  {
+    title: "姓名",
+    dataIndex: "name",
+    key: "name",
+    sorter: true,
+  },
+  {
+    title: "班级",
+    dataIndex: "className",
+    key: "className",
+    sorter: true,
+  },
+  {
+    title: "学号",
+    dataIndex: "studentNumber",
+    key: "studentNumber",
+    sorter: true,
+  },
+  {
+    title: "操作",
+    slotName: "action",
+  },
+];
+
+const fetchStudents = async () => {
+  loading.value = true;
+  try {
+    const response = await StudentsControllerService.listStudentByPageUsingPost(
+      { ...searchParams.value }
+    );
+    if (response.code === 0) {
+      students.value = response.data.records;
+      total.value = response.data.total;
+    } else {
+      message.error(response.message);
+    }
+  } catch (error) {
+    message.error("请求失败");
+  } finally {
+    loading.value = false;
+  }
+};
+
+const onPageChange = (page: number) => {
+  searchParams.value = {
+    ...searchParams.value,
+    current: page,
+  };
+  fetchStudents(); // 明确调用数据加载
+};
+const doSubmit = () => {
+  console.log("搜索条件：", searchParams.value); // 打印 searchParams 的内容
+  fetchStudents(); // 明确调用数据加载
+};
+// 新增查看详情处理函数
+const deleteStudent = async (id: number) => {
+  try {
+    const res = await StudentsControllerService.deleteStudentUsingPost(id);
+    if (res.code === 0) {
+      message.success("删除成功");
+      await fetchStudents();
+    } else {
+      message.error("删除失败: " + res.message);
+    }
+  } catch (error) {
+    message.error("请求失败，请重试");
+  }
+};
 </script>
 
 <style scoped>
