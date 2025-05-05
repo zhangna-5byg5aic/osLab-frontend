@@ -34,7 +34,13 @@
         </div>
       </div>
     </a-card>
-
+    <div>
+      <input type="file" @change="handleFileChange" accept=".xlsx,.csv" />
+      <button @click="uploadAndDownload" :disabled="!file">上传文件</button>
+      <p v-if="uploading">上传中...</p>
+      <p v-if="error" style="color: red">{{ error }}</p>
+      <p v-if="success" style="color: green">上传成功！</p>
+    </div>
     <!-- 错误提示 -->
     <a-result
       v-if="error"
@@ -50,9 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, handleError } from "vue";
 import dayjs from "dayjs";
-import { LoginUserVO, UserControllerService } from "../../../generated";
+import {
+  LoginUserVO,
+  StudentsControllerService,
+  UserControllerService,
+} from "../../../generated";
+import { message } from "ant-design-vue";
 
 // 用户角色映射
 const userRoleMap: Record<string, string> = {
@@ -85,7 +96,49 @@ const loadUserData = async () => {
     loading.value = false;
   }
 };
+const file = ref<Blob | null>(null);
+const uploading = ref(false);
+const success = ref(false);
+// 处理文件选择
+const handleFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    file.value = target.files[0];
+    error.value = null;
+    success.value = false;
+  }
+};
 
+// 上传并处理下载
+const uploadAndDownload = async () => {
+  if (!file.value) return;
+
+  uploading.value = true;
+  error.value = null;
+
+  try {
+    // 假设 API 返回的是 Blob 类型文件
+    await StudentsControllerService.uploadStudentsFileUsingPost(file.value);
+  } catch (err: any) {
+    handleUploadError(err);
+  } finally {
+    uploading.value = false;
+  }
+};
+
+// 处理上传错误
+const handleUploadError = (err: any) => {
+  if (err.status === 401) {
+    error.value = "未授权，请先登录";
+  } else if (err.status === 403) {
+    error.value = "无权限访问此功能";
+  } else if (err.status === 404) {
+    error.value = "接口不存在";
+  } else {
+    error.value = `上传失败: ${err.message || "未知错误"}`;
+  }
+  console.error("上传错误:", err);
+};
 // 生命周期钩子
 onMounted(() => {
   loadUserData();
