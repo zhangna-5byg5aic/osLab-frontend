@@ -333,6 +333,8 @@ const onAnswerChange = (value: string) => {
 
 <style scoped>
 #addQuestionView {
+  max-width: 90%;
+  margin: 0 auto;
 }
 /* 父组件中定义高度 */
 .code-editor-wrapper {

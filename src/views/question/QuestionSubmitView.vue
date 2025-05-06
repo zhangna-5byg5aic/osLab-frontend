@@ -1,30 +1,38 @@
 <template>
   <div id="questionSubmitView">
-    <a-form :model="searchParams" layout="inline">
-      <a-form-item field="questionId" label="题号" style="min-width: 240px">
-        <a-input v-model="searchParams.questionId" placeholder="请输入" />
+    <a-form :model="filterParams" layout="inline">
+      <a-form-item label="题目名称">
+        <a-input
+          v-model="filterParams.questionName"
+          placeholder="请输入题目名称"
+        />
       </a-form-item>
-      <a-form-item field="language" label="编程语言" style="min-width: 240px">
-        <a-select
-          v-model="searchParams.language"
-          :style="{ width: '320px' }"
-          placeholder="选择编程语言"
-        >
-          <a-option>java</a-option>
-          <a-option>cpp</a-option>
-          <a-option>go</a-option>
-          <a-option>html</a-option>
+      <a-form-item label="提交者">
+        <a-input
+          v-model="filterParams.submitUser"
+          placeholder="请输入提交者用户名"
+        />
+      </a-form-item>
+      <a-form-item label="状态">
+        <a-select v-model="filterParams.status" placeholder="请选择状态">
+          <a-option value="0">等待中</a-option>
+          <a-option value="1">判题中</a-option>
+          <a-option value="2">判题完成</a-option>
+          <a-option value="3">判题失败</a-option>
         </a-select>
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="doSubmit">搜索</a-button>
       </a-form-item>
+      <a-form-item>
+        <a-button @click="resetForm">重置</a-button>
+      </a-form-item>
     </a-form>
-    <a-divider size="0" />
+    <a-divider />
     <a-table
       :ref="tableRef"
       :columns="columns"
-      :data="dataList"
+      :data="filterDataList"
       :pagination="{
         showTotal: true,
         pageSize: searchParams.pageSize,
@@ -42,22 +50,35 @@
         </a-tag>
       </template>
       <template #createTime="{ record }">
-        {{ moment(record.createTime).format("YYYY-MM-DD") }}
+        {{ moment(record.createTime).format("YYYY-MM-DD HH:mm:ss") }}
       </template>
       <template #JudgeStatus="{ record }">
-        <div>
-          <span v-if="record.status === 0">等待中</span>
-          <span v-else-if="record.status === 1">判题中</span>
-          <span v-else-if="record.status === 2">判题成功</span>
-          <span v-else-if="record.status === 3">判题失败</span>
-        </div>
+        <a-tag :color="getStatusColor(record.status)">
+          <template v-if="record.status === 0">
+            <a-icon type="clock-circle" /> 等待中
+          </template>
+          <template v-else-if="record.status === 1">
+            <LoadingOutlined /> 判题中
+          </template>
+          <template v-else-if="record.status === 2">
+            <CheckCircleOutlined /> 判题完成
+          </template>
+          <template v-else-if="record.status === 3">
+            <ExclamationCircleOutlined /> 判题失败
+          </template>
+        </a-tag>
       </template>
       <template #question="{ record }">
         {{ record.questionVO?.title }}
       </template>
+      <template #userInfo="{ record }">
+        {{ record.userVO?.userName }}
+      </template>
       <!-- 新增操作列 -->
       <template #action="{ record }">
-        <a-button @click="handleViewDetail(record.id)">查看详情</a-button>
+        <a-button @click="handleViewDetail(record.id)" type="primary"
+          >查看详情</a-button
+        >
       </template>
     </a-table>
     <!-- 详情模态框 -->
@@ -70,9 +91,6 @@
       <a-descriptions :column="1" bordered v-if="detail">
         <a-descriptions-item label="题目名称">{{
           detail.questionVO?.title
-        }}</a-descriptions-item>
-        <a-descriptions-item label="编程语言">{{
-          detail.language
         }}</a-descriptions-item>
         <a-descriptions-item label="提交代码">
           <pre class="code-block">{{ detail.code }}</pre>
@@ -88,6 +106,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watchEffect } from "vue";
 import {
+  Page_QuestionSubmitVO_,
   Question,
   QuestionControllerService,
   QuestionSubmitQueryRequest,
@@ -96,6 +115,11 @@ import {
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 import moment from "moment";
+import {
+  LoadingOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons-vue";
 
 const tableRef = ref();
 
@@ -103,13 +127,19 @@ const tableRef = ref();
 const visible = ref(false);
 const detail = ref<QuestionSubmitVO>();
 
-const dataList = ref([]);
+const dataList = ref<QuestionSubmitVO[]>([]);
+const filterDataList = ref<QuestionSubmitVO[]>([]);
 const total = ref(0);
 const searchParams = ref<QuestionSubmitQueryRequest>({
   questionId: undefined,
   language: undefined,
   pageSize: 10,
   current: 1,
+});
+const filterParams = ref({
+  questionName: "",
+  submitUser: "",
+  status: undefined,
 });
 
 const loadData = async () => {
@@ -123,6 +153,7 @@ const loadData = async () => {
   if (res.code === 0) {
     dataList.value = res.data.records;
     total.value = res.data.total;
+    filterDataList.value = res.data.records;
   } else {
     message.error("加载失败，" + res.message);
   }
@@ -143,13 +174,17 @@ onMounted(() => {
 });
 
 const columns = [
+  // {
+  //   title: "提交号",
+  //   dataIndex: "id",
+  // },
+  // {
+  //   title: "编程语言",
+  //   dataIndex: "language",
+  // },
   {
-    title: "提交号",
-    dataIndex: "id",
-  },
-  {
-    title: "编程语言",
-    dataIndex: "language",
+    title: "题目",
+    slotName: "question",
   },
   {
     title: "判题信息",
@@ -161,15 +196,11 @@ const columns = [
     slotName: "JudgeStatus",
   },
   {
-    title: "题目",
-    slotName: "question",
+    title: "提交者",
+    slotName: "userInfo",
   },
   {
-    title: "提交者 id",
-    dataIndex: "userId",
-  },
-  {
-    title: "创建时间",
+    title: "提交时间",
     slotName: "createTime",
   },
   {
@@ -201,11 +232,48 @@ const toQuestionPage = (question: Question) => {
  * 确认搜索，重新加载数据
  */
 const doSubmit = () => {
-  // 这里需要重置搜索页号
-  searchParams.value = {
-    ...searchParams.value,
-    current: 1,
+  console.log("状态是：", typeof filterParams.value.status);
+  // 对 dataList 进行筛选
+  filterDataList.value = dataList.value.filter((item) => {
+    // 根据题目名称筛选
+    if (
+      filterParams.value.questionName &&
+      (!item.questionVO ||
+        !item.questionVO.title ||
+        !item.questionVO.title
+          .toLowerCase()
+          .includes(filterParams.value.questionName.toLowerCase()))
+    ) {
+      return false;
+    }
+    // 根据提交者用户名筛选
+    if (
+      filterParams.value.submitUser &&
+      (!item.userVO ||
+        !item.userVO.userName ||
+        !item.userVO.userName
+          .toLowerCase()
+          .includes(filterParams.value.submitUser.toLowerCase()))
+    ) {
+      return false;
+    }
+    // 根据状态筛选
+    if (
+      filterParams.value.status !== undefined &&
+      item.status !== Number(filterParams.value.status)
+    ) {
+      return false;
+    }
+    return true;
+  });
+};
+const resetForm = () => {
+  filterParams.value = {
+    questionName: "",
+    submitUser: "",
+    status: undefined,
   };
+  filterDataList.value = dataList.value;
 };
 // 新增查看详情处理函数
 const handleViewDetail = async (id: number) => {
@@ -223,11 +291,25 @@ const handleViewDetail = async (id: number) => {
     message.error("请求失败，请重试");
   }
 };
+const getStatusColor = (status: number) => {
+  switch (status) {
+    case 0:
+      return "orange"; // 等待中
+    case 1:
+      return "blue"; // 判题中
+    case 2:
+      return "green"; // 判题成功
+    case 3:
+      return "red"; // 判题失败
+    default:
+      return "default";
+  }
+};
 </script>
 
 <style scoped>
 #questionSubmitView {
-  max-width: 1280px;
+  max-width: 90%;
   margin: 0 auto;
 }
 /* 新增代码块样式 */

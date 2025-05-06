@@ -216,7 +216,7 @@ const categories = ref([{ name: "核心概念" }, { name: "子概念" }]);*/
 
 <style>
 #viewQuestionView {
-  max-width: 1400px;
+  max-width: 90%;
   margin: 0 auto;
 }
 

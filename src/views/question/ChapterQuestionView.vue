@@ -1,34 +1,39 @@
 <template>
-  <a-table
-    :columns="columns"
-    :data-source="mainTableData"
-    :row-key="(record) => record.id"
-    :expandedRowKeys="expandedRowKeys"
-    @expand="handleExpand"
-  >
-    <template #expandedRowRender="{ record }">
+  <div id="chapterQuestionView">
+    <a-card>
       <a-table
-        :columns="innerColumns"
-        :data-source="getChildrenData(record.id)"
-        :loading="childLoading[record.id]"
-        :pagination="false"
-        :row-key="(childRecord) => childRecord.id"
+        :columns="columns"
+        :data-source="mainTableData"
+        :row-key="(record) => record.id"
+        :expandedRowKeys="expandedRowKeys"
+        @expand="handleExpand"
+        class="my-custom-table"
       >
-        <template #action="{ record: childRecord }">
-          <a-button type="link" @click="handleChildAction(childRecord)">
-            做题
-          </a-button>
-        </template>
-        <template #tags="{ text: tags }">
-          <a-space wrap>
-            <a-tag v-for="tag in tags" :key="tag" color="blue">
-              {{ tag }}
-            </a-tag>
-          </a-space>
+        <template #expandedRowRender="{ record }">
+          <a-table
+            :columns="innerColumns"
+            :data-source="getChildrenData(record.id)"
+            :loading="childLoading[record.id]"
+            :pagination="false"
+            :row-key="(childRecord) => childRecord.id"
+          >
+            <template #action="{ record: childRecord }">
+              <a-button type="primary" @click="handleChildAction(childRecord)">
+                去做题
+              </a-button>
+            </template>
+            <template #tags="{ text: tags }">
+              <a-space wrap>
+                <a-tag v-for="tag in tags" :key="tag" color="blue">
+                  {{ tag }}
+                </a-tag>
+              </a-space>
+            </template>
+          </a-table>
         </template>
       </a-table>
-    </template>
-  </a-table>
+    </a-card>
+  </div>
 </template>
 
 <script>
@@ -64,18 +69,18 @@ export default {
 
     // 子表列定义
     const innerColumns = [
-      {
+      /*{
         title: "题号",
         dataIndex: "id",
         key: "id",
-      },
+      },*/
       {
         title: "题目名称",
         dataIndex: "title",
         key: "title",
       },
       {
-        title: "标签",
+        title: "关联知识点",
         dataIndex: "tags",
         key: "tags",
         slots: { customRender: "tags" },
@@ -174,10 +179,11 @@ export default {
 </script>
 
 <style>
-/* 自定义样式 */
-.ant-table-expanded-row {
-  background: #fafafa;
+#chapterQuestionView {
+  max-width: 90%;
+  margin: 0 auto;
 }
+/* 自定义样式 */
 .ant-table-expanded-row .ant-table {
   margin: 0;
 }

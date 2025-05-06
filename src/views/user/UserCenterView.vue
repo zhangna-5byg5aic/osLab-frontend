@@ -1,100 +1,105 @@
 <template>
-  <a-spin :spinning="loading">
-    <a-card v-if="userInfo" class="user-center-card">
-      <div class="user-profile">
-        <!-- 头像部分 -->
-        <div class="avatar-section">
-          <!--          <a-avatar :src="require('@/assets/avatar.png')" :size="120" />-->
-          <img :src="require('@/assets/avatar.png')" class="avatar" />
-          <div class="user-name">
-            <h1>{{ userInfo.userName }}</h1>
-            <a-tag v-if="userInfo.userRole" color="blue">{{
-              userRoleMap[userInfo.userRole]
-            }}</a-tag>
+  <div id="userCenterView">
+    <a-spin :spinning="loading">
+      <a-card v-if="userInfo" class="user-center-card">
+        <div class="user-profile">
+          <!-- 头像部分 -->
+          <div class="avatar-section">
+            <!--          <a-avatar :src="require('@/assets/avatar.png')" :size="120" />-->
+            <img :src="require('@/assets/avatar.png')" class="avatar" />
+            <div class="user-name">
+              <h1>{{ userInfo.userName }}</h1>
+              <a-tag v-if="userInfo.userRole" color="blue">{{
+                userRoleMap[userInfo.userRole]
+              }}</a-tag>
+            </div>
+          </div>
+
+          <!-- 详细信息 -->
+          <a-divider />
+          <div class="user-details">
+            <a-descriptions bordered :column="1">
+              <a-descriptions-item label="用户ID">{{
+                userInfo.id
+              }}</a-descriptions-item>
+              <a-descriptions-item label="个人简介">
+                {{ userInfo.userProfile || "暂无简介" }}
+              </a-descriptions-item>
+              <a-descriptions-item label="注册时间">
+                {{ formatTime(userInfo.createTime) }}
+              </a-descriptions-item>
+              <a-descriptions-item label="最后更新时间">
+                {{ formatTime(userInfo.updateTime) }}
+              </a-descriptions-item>
+            </a-descriptions>
           </div>
         </div>
-
-        <!-- 详细信息 -->
-        <a-divider />
-        <div class="user-details">
-          <a-descriptions bordered :column="1">
-            <a-descriptions-item label="用户ID">{{
-              userInfo.id
-            }}</a-descriptions-item>
-            <a-descriptions-item label="个人简介">
-              {{ userInfo.userProfile || "暂无简介" }}
-            </a-descriptions-item>
-            <a-descriptions-item label="注册时间">
-              {{ formatTime(userInfo.createTime) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="最后更新时间">
-              {{ formatTime(userInfo.updateTime) }}
-            </a-descriptions-item>
-          </a-descriptions>
+      </a-card>
+      <a-card title="批量添加学生">
+        <div>
+          <input type="file" @change="handleFileChange" accept=".xlsx,.csv" />
+          <a-button @click="uploadAndDownload" :disabled="!file" type="primary">
+            上传文件
+          </a-button>
+          <p v-if="uploading">上传中...</p>
+          <p v-if="error" style="color: red">{{ error }}</p>
+          <p v-if="success" style="color: green">上传成功！</p>
         </div>
-      </div>
-    </a-card>
-    <a-card title="批量添加学生">
-      <div>
-        <input type="file" @change="handleFileChange" accept=".xlsx,.csv" />
-        <a-button @click="uploadAndDownload" :disabled="!file" type="primary">
-          上传文件
-        </a-button>
-        <p v-if="uploading">上传中...</p>
-        <p v-if="error" style="color: red">{{ error }}</p>
-        <p v-if="success" style="color: green">上传成功！</p>
-      </div>
-    </a-card>
-    <a-card>
-      <a-form :model="searchParams" layout="inline">
-        <a-form-item label="姓名" field="name">
-          <a-input v-model="searchParams.name" placeholder="请输入姓名" />
-        </a-form-item>
-        <a-form-item label="班级" field="className">
-          <a-input v-model="searchParams.className" placeholder="请输入班级" />
-        </a-form-item>
-        <a-form-item label="学号" field="studentNumber">
-          <a-input
-            v-model="searchParams.studentNumber"
-            placeholder="请输入学号"
-          />
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" @click="doSubmit">搜索</a-button>
-        </a-form-item>
-      </a-form>
+      </a-card>
+      <a-card>
+        <a-form :model="searchParams" layout="inline">
+          <a-form-item label="姓名" field="name">
+            <a-input v-model="searchParams.name" placeholder="请输入姓名" />
+          </a-form-item>
+          <a-form-item label="班级" field="className">
+            <a-input
+              v-model="searchParams.className"
+              placeholder="请输入班级"
+            />
+          </a-form-item>
+          <a-form-item label="学号" field="studentNumber">
+            <a-input
+              v-model="searchParams.studentNumber"
+              placeholder="请输入学号"
+            />
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" @click="doSubmit">搜索</a-button>
+          </a-form-item>
+        </a-form>
 
-      <a-table
-        :columns="columns"
-        :data="students"
-        :pagination="{
-          showTotal: true,
-          pageSize: searchParams.pageSize,
-          current: searchParams.current,
-          total,
-        }"
-        :loading="loading"
-        @page-change="onPageChange"
+        <a-table
+          :columns="columns"
+          :data="students"
+          :pagination="{
+            showTotal: true,
+            pageSize: searchParams.pageSize,
+            current: searchParams.current,
+            total,
+          }"
+          :loading="loading"
+          @page-change="onPageChange"
+        >
+          <template #action="{ record }">
+            <a-button @click="deleteStudent(record.id)" status="danger"
+              >删除</a-button
+            >
+          </template>
+        </a-table>
+      </a-card>
+      <!-- 错误提示 -->
+      <a-result
+        v-if="error"
+        status="error"
+        title="数据加载失败"
+        :sub-title="error"
       >
-        <template #action="{ record }">
-          <a-button @click="deleteStudent(record.id)" status="danger"
-            >删除</a-button
-          >
+        <template #extra>
+          <a-button type="primary" @click="loadUserData">重试</a-button>
         </template>
-      </a-table>
-    </a-card>
-    <!-- 错误提示 -->
-    <a-result
-      v-if="error"
-      status="error"
-      title="数据加载失败"
-      :sub-title="error"
-    >
-      <template #extra>
-        <a-button type="primary" @click="loadUserData">重试</a-button>
-      </template>
-    </a-result>
-  </a-spin>
+      </a-result>
+    </a-spin>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -270,6 +275,10 @@ const deleteStudent = async (id: number) => {
 </script>
 
 <style scoped>
+#userCenterView {
+  max-width: 90%;
+  margin: 0 auto;
+}
 .user-center-card {
   max-width: 800px;
   margin: 20px auto;
