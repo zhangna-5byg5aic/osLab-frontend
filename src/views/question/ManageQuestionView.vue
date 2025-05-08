@@ -23,7 +23,7 @@
           <a-tag
             v-for="(tag, index) of JSON.parse(record.tags)"
             :key="index"
-            color="green"
+            color="blue"
             >{{ tag }}
           </a-tag>
         </a-space>
@@ -42,7 +42,7 @@
         </a-descriptions>
       </template>
       <template #createTime="{ record }">
-        {{ moment(record.createTime).format("YYYY-MM-DD") }}
+        {{ moment(record.createTime).format("YYYY-MM-DD HH:mm:ss") }}
       </template>
       <template #judgeCase="{ record }">
         <a-descriptions style="margin-top: 20px" :size="'mini'" :column="1">
@@ -107,30 +107,30 @@ onMounted(() => {
 // {id: "1", title: "A+ D", content: "新的题目内容", tags: "["二叉树"]", answer: "新的答案", submitNum: 0,…}
 
 const columns = [
-  {
+  /*{
     title: "id",
     dataIndex: "id",
-  },
+  },*/
   {
-    title: "标题",
+    title: "题目名称",
     dataIndex: "title",
   },
-  {
+  /*{
     title: "内容",
     dataIndex: "content",
     ellipsis: true,
     tooltip: true,
-  },
+  },*/
   {
-    title: "标签",
+    title: "关联知识点",
     slotName: "tags",
   },
-  {
+  /*{
     title: "参考答案",
     dataIndex: "answer",
     ellipsis: true,
     tooltip: true,
-  },
+  },*/
   // {
   //   title: "提交数",
   //   dataIndex: "submitNum",
@@ -147,10 +147,10 @@ const columns = [
     title: "判题用例",
     slotName: "judgeCase",
   },*/
-  {
+  /*{
     title: "创建用户id",
     dataIndex: "userId",
-  },
+  },*/
   {
     title: "创建时间",
     slotName: "createTime",

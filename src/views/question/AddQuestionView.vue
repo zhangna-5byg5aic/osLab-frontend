@@ -1,149 +1,174 @@
 <template>
   <div id="addQuestionView">
-    <a-form :model="form" label-align="left">
-      <a-form-item field="title" label="标题">
-        <a-input v-model="form.title" placeholder="请输入标题" />
-      </a-form-item>
-      <a-form-item field="tags" label="关联知识点">
-        <a-input-tag
-          v-model="form.tags"
-          placeholder="请选择关联知识点"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item>
-        <div class="collapsible-panel">
-          <div class="panel-header" @click="toggle">
-            <h3>{{ isOpen ? "收起全部知识点" : "展开全部知识点" }}</h3>
-          </div>
-          <div v-if="isOpen" class="panel-body">
-            <a-checkbox-group v-model="form.tags">
-              <a-checkbox v-for="tag in tags" :key="tag" :value="tag">
-                {{ tag }}</a-checkbox
+    <a-card>
+      <div class="form-container">
+        <a-form :model="form" label-align="left" class="centered-form">
+          <a-form-item field="title" label="标题">
+            <a-input
+              v-model="form.title"
+              placeholder="请输入标题"
+              class="form-item-width"
+            />
+          </a-form-item>
+          <a-form-item field="tags" label="关联知识点">
+            <a-input-tag
+              v-model="form.tags"
+              placeholder="请选择关联知识点"
+              allow-clear
+              class="form-item-width"
+            />
+          </a-form-item>
+          <a-form-item>
+            <div class="collapsible-panel">
+              <div class="panel-header" @click="toggle">
+                <span>
+                  <template v-if="isOpen">
+                    <DownOutlined />
+                    <!-- 假设这是一个图标组件 -->
+                  </template>
+                  <template v-else>
+                    <RightOutlined />
+                    <!-- 假设这是一个图标组件 -->
+                  </template>
+                  全部知识点
+                </span>
+              </div>
+              <div v-if="isOpen" class="panel-body">
+                <a-checkbox-group v-model="form.tags">
+                  <a-checkbox v-for="tag in tags" :key="tag" :value="tag">
+                    {{ tag }}</a-checkbox
+                  >
+                </a-checkbox-group>
+              </div>
+            </div>
+          </a-form-item>
+          <a-form-item field="setId" label="题目集">
+            <a-select
+              v-model="form.setId"
+              placeholder="请选择题目集"
+              allow-clear
+              :loading="setsLoading"
+              class="form-item-width"
+              style="width: 80%"
+            >
+              <a-option
+                v-for="set in questionSets"
+                :key="set.id"
+                :value="set.id"
+                :label="set.setName"
               >
-            </a-checkbox-group>
-          </div>
-        </div>
-      </a-form-item>
-      <a-form-item field="setId" label="题目集">
-        <a-select
-          v-model="form.setId"
-          placeholder="请选择题目集"
-          allow-clear
-          :loading="setsLoading"
-        >
-          <a-option
-            v-for="set in questionSets"
-            :key="set.id"
-            :value="set.id"
-            :label="set.setName"
-          >
-            {{ set.setName }}
-          </a-option>
-        </a-select>
-      </a-form-item>
-      <a-form-item field="content" label="题目内容">
-        <MdEditor :value="form.content" :handle-change="onContentChange" />
-      </a-form-item>
-      <a-form-item field="originalCode" label="初始框架代码">
-        <div class="code-editor-wrapper">
-          <CodeEditor
-            :value="form.originalCode"
-            :language="form.language"
-            :handle-change="onOriginalCodeChange"
-          />
-        </div>
-      </a-form-item>
-      <a-form-item field="answer" label="答案">
-        <div class="answer-editor">
-          <CodeEditor
-            :value="form.answer"
-            :language="form.language"
-            :handle-change="onAnswerChange"
-          />
-        </div>
-        <!--        <MdEditor :value="form.answer" :handle-change="onAnswerChange" />-->
-      </a-form-item>
-      <!--      <a-form-item label="判题配置" :content-flex="false" :merge-props="false">
-        <a-space direction="vertical" style="min-width: 480px">
-          <a-form-item field="judgeConfig.timeLimit" label="时间限制">
-            <a-input-number
-              v-model="form.judgeConfig.timeLimit"
-              placeholder="请输入时间限制"
-              mode="button"
-              min="0"
-              size="large"
+                {{ set.setName }}
+              </a-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item field="content" label="题目内容">
+            <MdEditor
+              :value="form.content"
+              :handle-change="onContentChange"
+              class="form-item-width"
             />
           </a-form-item>
-          <a-form-item field="judgeConfig.memoryLimit" label="内存限制">
-            <a-input-number
-              v-model="form.judgeConfig.memoryLimit"
-              placeholder="请输入内存限制"
-              mode="button"
-              min="0"
-              size="large"
-            />
+          <a-form-item field="originalCode" label="初始框架代码">
+            <div class="code-editor-wrapper">
+              <CodeEditor
+                :value="form.originalCode"
+                :language="form.language"
+                :handle-change="onOriginalCodeChange"
+              />
+            </div>
           </a-form-item>
-          <a-form-item field="judgeConfig.stackLimit" label="堆栈限制">
-            <a-input-number
-              v-model="form.judgeConfig.stackLimit"
-              placeholder="请输入堆栈限制"
-              mode="button"
-              min="0"
-              size="large"
-            />
+          <a-form-item field="answer" label="答案">
+            <div class="answer-editor">
+              <CodeEditor
+                :value="form.answer"
+                :language="form.language"
+                :handle-change="onAnswerChange"
+              />
+            </div>
+            <!--        <MdEditor :value="form.answer" :handle-change="onAnswerChange" />-->
           </a-form-item>
-        </a-space>
-      </a-form-item>-->
-      <!--      <a-form-item
-        label="测试用例配置"
-        :content-flex="false"
-        :merge-props="false"
-      >
-        <a-form-item
-          v-for="(judgeCaseItem, index) of form.judgeCase"
-          :key="index"
-          no-style
-        >
-          <a-space direction="vertical" style="min-width: 640px">
-            <a-form-item
-              :field="`form.judgeCase[${index}].input`"
-              :label="`输入用例-${index}`"
-              :key="index"
-            >
-              <a-input
-                v-model="judgeCaseItem.input"
-                placeholder="请输入测试输入用例"
+          <!--      <a-form-item label="判题配置" :content-flex="false" :merge-props="false">
+          <a-space direction="vertical" style="min-width: 480px">
+            <a-form-item field="judgeConfig.timeLimit" label="时间限制">
+              <a-input-number
+                v-model="form.judgeConfig.timeLimit"
+                placeholder="请输入时间限制"
+                mode="button"
+                min="0"
+                size="large"
               />
             </a-form-item>
-            <a-form-item
-              :field="`form.judgeCase[${index}].output`"
-              :label="`输出用例-${index}`"
-              :key="index"
-            >
-              <a-input
-                v-model="judgeCaseItem.output"
-                placeholder="请输入测试输出用例"
+            <a-form-item field="judgeConfig.memoryLimit" label="内存限制">
+              <a-input-number
+                v-model="form.judgeConfig.memoryLimit"
+                placeholder="请输入内存限制"
+                mode="button"
+                min="0"
+                size="large"
               />
             </a-form-item>
-            <a-button status="danger" @click="handleDelete(index)">
-              删除
-            </a-button>
+            <a-form-item field="judgeConfig.stackLimit" label="堆栈限制">
+              <a-input-number
+                v-model="form.judgeConfig.stackLimit"
+                placeholder="请输入堆栈限制"
+                mode="button"
+                min="0"
+                size="large"
+              />
+            </a-form-item>
           </a-space>
-        </a-form-item>
-        <div style="margin-top: 32px">
-          <a-button @click="handleAdd" type="outline" status="success"
-            >新增测试用例
-          </a-button>
-        </div>
-      </a-form-item>-->
-      <div style="margin-top: 16px" />
-      <a-form-item>
+        </a-form-item>-->
+          <!--      <a-form-item
+          label="测试用例配置"
+          :content-flex="false"
+          :merge-props="false"
+        >
+          <a-form-item
+            v-for="(judgeCaseItem, index) of form.judgeCase"
+            :key="index"
+            no-style
+          >
+            <a-space direction="vertical" style="min-width: 640px">
+              <a-form-item
+                :field="`form.judgeCase[${index}].input`"
+                :label="`输入用例-${index}`"
+                :key="index"
+              >
+                <a-input
+                  v-model="judgeCaseItem.input"
+                  placeholder="请输入测试输入用例"
+                />
+              </a-form-item>
+              <a-form-item
+                :field="`form.judgeCase[${index}].output`"
+                :label="`输出用例-${index}`"
+                :key="index"
+              >
+                <a-input
+                  v-model="judgeCaseItem.output"
+                  placeholder="请输入测试输出用例"
+                />
+              </a-form-item>
+              <a-button status="danger" @click="handleDelete(index)">
+                删除
+              </a-button>
+            </a-space>
+          </a-form-item>
+          <div style="margin-top: 32px">
+            <a-button @click="handleAdd" type="outline" status="success"
+              >新增测试用例
+            </a-button>
+          </div>
+        </a-form-item>-->
+          <div style="margin-top: 16px" />
+        </a-form>
+      </div>
+      <div class="button-contain">
         <a-button type="primary" style="min-width: 200px" @click="doSubmit"
           >提交
         </a-button>
-      </a-form-item>
-    </a-form>
+      </div>
+    </a-card>
   </div>
 </template>
 
@@ -159,6 +184,7 @@ import message from "@arco-design/web-vue/es/message";
 import { useRoute, useRouter } from "vue-router";
 import CodeEditor from "@/components/CodeEditor.vue";
 import AccordionCollapse from "@/views/question/CollapseView.vue";
+import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
 
 const route = useRoute();
 // 如果页面地址包含 update，视为更新页面
@@ -271,8 +297,8 @@ const loadData = async () => {
 };
 
 onMounted(() => {
-  loadData();
   loadQuestionSets();
+  loadData();
   fetchTags();
 });
 const doSubmit = async () => {
@@ -339,28 +365,51 @@ const onAnswerChange = (value: string) => {
 /* 父组件中定义高度 */
 .code-editor-wrapper {
   height: 500px;
-  width: 60%;
+  width: 80%;
 }
 .answer-editor {
   height: 500px;
-  width: 60%;
+  width: 80%;
 }
 .collapsible-panel {
   border: 1px solid #ddd;
-  margin: 10px;
   border-radius: 5px;
+  width: 80%;
+  max-width: 80%;
 }
 
 .panel-header {
-  background-color: #f5f5f5;
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  justify-content: flex-start; /* 水平起始对齐 */
   padding: 10px;
   cursor: pointer;
   text-align: center;
+  background-color: #007bff; /* 蓝色背景 */
+  color: white; /* 白色文字 */
 }
 
 .panel-body {
   padding: 10px;
   background-color: #f9f9f9;
-  border-top: 1px solid #ddd;
+  border: 1px solid #007bff;
+}
+.form-item-width {
+  width: 80%; /* 或者设置为具体的宽度，如 300px */
+}
+.form-container {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  height: 100%; /* 确保容器占满整个卡片高度 */
+}
+.centered-form {
+  width: 80%; /* 设置表单的宽度 */
+  margin: auto; /* 水平居中 */
+}
+.button-contain {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  margin-top: 16px;
 }
 </style>

@@ -30,7 +30,12 @@
               : "未登录"
           }}
         </div>
-        <div class="user-avatar" @click="toggleMenu">
+        <div
+          class="user-avatar"
+          @click="toggleMenu"
+          @mouseenter="showMenu = true"
+          @mouseleave="showMenu = false"
+        >
           <img
             :src="
               store.state.user?.loginUser?.avatarUrl ||
@@ -164,6 +169,7 @@ const logout = async () => {
 
 .dropdown-menu {
   position: absolute;
+  z-index: 1000; /* 确保这个值高于其他元素 */
   top: 45px;
   right: 0;
   background-color: white;

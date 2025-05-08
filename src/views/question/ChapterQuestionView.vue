@@ -51,7 +51,7 @@ export default {
     // 主表列定义
     const columns = [
       {
-        title: "名称",
+        title: "章节名称",
         dataIndex: "setName",
         key: "setName",
       },

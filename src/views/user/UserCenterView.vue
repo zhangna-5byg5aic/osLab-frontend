@@ -1,42 +1,107 @@
 <template>
   <div id="userCenterView">
-    <a-spin :spinning="loading">
-      <a-card v-if="userInfo" class="user-center-card">
-        <div class="user-profile">
-          <!-- 头像部分 -->
-          <div class="avatar-section">
-            <!--          <a-avatar :src="require('@/assets/avatar.png')" :size="120" />-->
-            <img :src="require('@/assets/avatar.png')" class="avatar" />
-            <div class="user-name">
-              <h1>{{ userInfo.userName }}</h1>
-              <a-tag v-if="userInfo.userRole" color="blue">{{
-                userRoleMap[userInfo.userRole]
-              }}</a-tag>
-            </div>
-          </div>
-
-          <!-- 详细信息 -->
-          <a-divider />
-          <div class="user-details">
-            <a-descriptions bordered :column="1">
-              <a-descriptions-item label="用户ID">{{
-                userInfo.id
-              }}</a-descriptions-item>
-              <a-descriptions-item label="个人简介">
-                {{ userInfo.userProfile || "暂无简介" }}
-              </a-descriptions-item>
-              <a-descriptions-item label="注册时间">
-                {{ formatTime(userInfo.createTime) }}
-              </a-descriptions-item>
-              <a-descriptions-item label="最后更新时间">
-                {{ formatTime(userInfo.updateTime) }}
-              </a-descriptions-item>
-            </a-descriptions>
+    <a-card v-if="userInfo" class="user-center-card">
+      <div class="user-profile">
+        <!-- 头像部分 -->
+        <div class="avatar-section">
+          <!--          <a-avatar :src="require('@/assets/avatar.png')" :size="120" />-->
+          <img :src="require('@/assets/avatar.png')" class="avatar" />
+          <div class="user-name">
+            <h1>{{ userInfo.userName }}</h1>
+            <a-tag v-if="userInfo.userRole" color="blue">{{
+              userRoleMap[userInfo.userRole]
+            }}</a-tag>
           </div>
         </div>
-      </a-card>
-      <a-card title="批量添加学生">
-        <div>
+
+        <!-- 详细信息 -->
+        <a-divider />
+        <div class="user-details">
+          <a-descriptions bordered :column="1">
+            <a-descriptions-item label="用户ID">{{
+              userInfo.id
+            }}</a-descriptions-item>
+            <a-descriptions-item label="个人简介">
+              {{ userInfo.userProfile || "暂无简介" }}
+            </a-descriptions-item>
+            <a-descriptions-item label="注册时间">
+              {{ formatTime(userInfo.createTime) }}
+            </a-descriptions-item>
+          </a-descriptions>
+        </div>
+      </div>
+    </a-card>
+    <a-divider style="height: 2px; background-color: #007bff"
+      >学生名单</a-divider
+    >
+    <a-card>
+      <a-form :model="searchParams" layout="inline">
+        <a-form-item label="姓名" field="name">
+          <a-input v-model="searchParams.name" placeholder="请输入姓名" />
+        </a-form-item>
+        <a-form-item label="班级" field="className">
+          <a-input v-model="searchParams.className" placeholder="请输入班级" />
+        </a-form-item>
+        <a-form-item label="学号" field="studentNumber">
+          <a-input
+            v-model="searchParams.studentNumber"
+            placeholder="请输入学号"
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button type="primary" @click="doSubmit">搜索</a-button>
+            <a-button @click="showModal">
+              <template #icon><PlusOutlined /></template>
+              新增学生</a-button
+            >
+          </a-space>
+        </a-form-item>
+      </a-form>
+      <a-divider></a-divider>
+      <a-table
+        :columns="columns"
+        :data="students"
+        :pagination="{
+          showTotal: true,
+          pageSize: searchParams.pageSize,
+          current: searchParams.current,
+          total,
+        }"
+        :loading="loading"
+        @page-change="onPageChange"
+      >
+        <template #action="{ record }">
+          <a-space>
+            <a-button type="primary">找回密码</a-button>
+            <a-button @click="deleteStudent(record.id)" status="danger"
+              >删除</a-button
+            >
+            <!--          <a-button @click="findPassword(record.id)">找回密码</a-button>-->
+          </a-space>
+        </template>
+      </a-table>
+    </a-card>
+  </div>
+  <a-modal
+    v-model:visible="addStudentVisible"
+    title="新增学生"
+    width="700px"
+    :footer="false"
+  >
+    <div class="admin-option">
+      <a-card>
+        <a-divider style="height: 2px; background-color: #007bff"
+          >批量添加</a-divider
+        >
+        <div class="add-batch">
+          <div class="tips">
+            <QuestionCircleTwoTone />
+            <p>
+              上传的表格必须包含列名“班级”、“学号”、“姓名”，上传成功后会下载学生账号信息注意查收
+            </p>
+          </div>
+          <label>请上传表格：</label>
           <input type="file" @change="handleFileChange" accept=".xlsx,.csv" />
           <a-button @click="uploadAndDownload" :disabled="!file" type="primary">
             上传文件
@@ -45,61 +110,59 @@
           <p v-if="error" style="color: red">{{ error }}</p>
           <p v-if="success" style="color: green">上传成功！</p>
         </div>
-      </a-card>
-      <a-card>
-        <a-form :model="searchParams" layout="inline">
-          <a-form-item label="姓名" field="name">
-            <a-input v-model="searchParams.name" placeholder="请输入姓名" />
-          </a-form-item>
-          <a-form-item label="班级" field="className">
-            <a-input
-              v-model="searchParams.className"
-              placeholder="请输入班级"
-            />
-          </a-form-item>
-          <a-form-item label="学号" field="studentNumber">
-            <a-input
-              v-model="searchParams.studentNumber"
-              placeholder="请输入学号"
-            />
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" @click="doSubmit">搜索</a-button>
-          </a-form-item>
-        </a-form>
-
-        <a-table
-          :columns="columns"
-          :data="students"
-          :pagination="{
-            showTotal: true,
-            pageSize: searchParams.pageSize,
-            current: searchParams.current,
-            total,
-          }"
-          :loading="loading"
-          @page-change="onPageChange"
+        <a-divider style="height: 2px; background-color: #007bff"
+          >逐个添加</a-divider
         >
-          <template #action="{ record }">
-            <a-button @click="deleteStudent(record.id)" status="danger"
-              >删除</a-button
-            >
-          </template>
-        </a-table>
+        <div class="add-single">
+          <a-form :model="studentForm" label-align="left">
+            <a-form-item field="className" label="班级">
+              <a-input
+                v-model="studentForm.className"
+                placeholder="请输入班级名称"
+              ></a-input>
+            </a-form-item>
+            <a-form-item field="name" label="姓名">
+              <a-input
+                v-model="studentForm.name"
+                placeholder="请输入学生姓名"
+              ></a-input>
+            </a-form-item>
+            <a-form-item field="studentNumber" label="学号">
+              <a-input
+                v-model="studentForm.studentNumber"
+                placeholder="请输入学生学号"
+              ></a-input>
+            </a-form-item>
+          </a-form>
+          <a-button type="primary" @click="addStudent">添加</a-button>
+        </div>
       </a-card>
-      <!-- 错误提示 -->
-      <a-result
-        v-if="error"
-        status="error"
-        title="数据加载失败"
-        :sub-title="error"
-      >
-        <template #extra>
-          <a-button type="primary" @click="loadUserData">重试</a-button>
-        </template>
-      </a-result>
-    </a-spin>
-  </div>
+    </div>
+  </a-modal>
+  <a-modal
+    v-model:visible="afterSubmitVisible"
+    title="学生账户详情"
+    width="700px"
+    :footer="false"
+  >
+    <a-descriptions :column="1" bordered v-if="addStudentDetail">
+      <a-descriptions-item label="姓名">
+        {{ addStudentDetail.name }}
+      </a-descriptions-item>
+      <a-descriptions-item label="班级">
+        {{ addStudentDetail.className }}
+      </a-descriptions-item>
+      <a-descriptions-item label="学号">
+        {{ addStudentDetail.studentNumber }}
+      </a-descriptions-item>
+      <a-descriptions-item label="账户名">
+        {{ addStudentDetail.userAccount }}
+      </a-descriptions-item>
+      <a-descriptions-item label="密码">
+        {{ addStudentDetail.userPassword }}
+      </a-descriptions-item>
+    </a-descriptions>
+  </a-modal>
 </template>
 
 <script setup lang="ts">
@@ -109,9 +172,11 @@ import {
   LoginUserVO,
   StudentQueryRequest,
   StudentsControllerService,
+  type StudentVO,
   UserControllerService,
 } from "../../../generated";
 import { message } from "ant-design-vue";
+import { QuestionCircleTwoTone, PlusOutlined } from "@ant-design/icons-vue";
 
 // 用户角色映射
 const userRoleMap: Record<string, string> = {
@@ -124,6 +189,36 @@ const userRoleMap: Record<string, string> = {
 const userInfo = ref<LoginUserVO | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
+
+const addStudentVisible = ref(false);
+const afterSubmitVisible = ref(false);
+const showModal = () => {
+  addStudentVisible.value = true;
+};
+let studentForm = ref({
+  className: "",
+  name: "",
+  studentNumber: "",
+});
+const addStudentDetail = ref<StudentVO>();
+const addStudent = async () => {
+  const res = await StudentsControllerService.addStudentsUsingPost(
+    studentForm.value
+  );
+  if (res.code === 0) {
+    message.success("添加成功");
+    addStudentDetail.value = res.data;
+    addStudentVisible.value = false;
+    afterSubmitVisible.value = true;
+    studentForm.value = {
+      className: "",
+      name: "",
+      studentNumber: "",
+    };
+  } else {
+    message.error("添加失败：", res.message);
+  }
+};
 
 // 时间格式化
 const formatTime = (time?: string) => {
@@ -272,6 +367,7 @@ const deleteStudent = async (id: number) => {
     message.error("请求失败，请重试");
   }
 };
+// const findPassword = async (id: number) => {};
 </script>
 
 <style scoped>
@@ -326,5 +422,19 @@ const deleteStudent = async (id: number) => {
   .user-center-card {
     margin: 10px;
   }
+}
+.tips {
+  display: flex; /* 使用 flexbox 布局 */
+  align-items: center; /* 垂直居中对齐 */
+  justify-content: flex-start; /* 水平起始对齐 */
+}
+
+.tips p {
+  margin-left: 8px; /* 在图标和文字之间添加一些间距 */
+}
+.add-single {
+  display: flex;
+  flex-direction: column; /* 子元素垂直排列 */
+  align-items: center; /* 水平居中对齐 */
 }
 </style>
